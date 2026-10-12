@@ -8,7 +8,8 @@
 // anyway — the bust is a third the size there, and the renderer caps its pixel
 // ratio lower. gate.ts picks between them at the layout breakpoint.
 //
-// Run with: npm run build:dionysus
+// Run with: bun run build:dionysus
+import { existsSync } from 'node:fs';
 import { mkdir, stat } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -101,5 +102,10 @@ async function build({ file, size }) {
     );
 }
 
+// The source is git-ignored, so a fresh clone does not have it.
+if (!existsSync(SRC)) {
+  console.error(`Missing ${SRC}\nThe source GLB is not in git. Copy it there first.`);
+  process.exit(1);
+}
 console.log('reading', SRC);
 for (const variant of VARIANTS) await build(variant);

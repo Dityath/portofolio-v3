@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "bun run check && astro build",
     "preview": "astro preview",
-    "check": "tsc --noEmit",
+    "check": "astro sync && tsc --noEmit",
     "lint": "biome check .",
     "format": "biome format --write .",
     "lint:fix": "biome check --write .",

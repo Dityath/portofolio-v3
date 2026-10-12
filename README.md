@@ -75,13 +75,13 @@ Open `TODO(content-review)` items. Each must be resolved before deployment:
 - `bun run dev` — dev server
 - `bun run build` — typecheck, then build the static site into `dist/`
 - `bun run preview` — serve the built output locally
-- `bun run check` — typecheck only (`tsc --noEmit`)
+- `bun run check` — typecheck only (`astro sync`, then `tsc --noEmit`)
 - `bun run lint` — Biome lint and format check across the repo
 - `bun run lint:fix` — Biome lint with safe fixes applied
 - `bun run format` — Biome format, write mode
 - `bun run ci` — `biome ci`, typecheck, then `astro build` (the same gates as CI)
 - `bun run build:dionysus` — regenerate `public/models/dionysus-bust.glb` from
-  `assets/dionysus-bust-source.glb`
+  `assets/dionysus-bust-source.glb` (local only, see Credits)
 - `bun run build:og` — regenerate the `public/og.png` social card from
   `src/data/site.ts` and the bust poster (run it after changing the name or role)
 
@@ -93,7 +93,9 @@ outside `public/`, so they are not deployed.
 `check` runs `tsc --noEmit` rather than `astro check`, which cannot run under
 TypeScript 7 yet — the native compiler does not expose the programmatic API the
 Astro language server needs. That means `.astro` templates are not type-checked;
-switching to TypeScript 6.x would restore it.
+switching to TypeScript 6.x would restore it. `astro sync` runs first because
+`tsconfig.json` includes the generated `.astro/types.d.ts`, which a fresh clone
+does not have; without it the typecheck fails in CI.
 
 ## Quality gates
 
@@ -114,8 +116,10 @@ Run `bun run ci` locally before pushing. It runs the same gates.
 
 ## Credits
 
-- Dionysus bust — source in `assets/`, kept out of `public/` so the 42 MB
-  original is never deployed. `scripts/build-dionysus.mjs` drops the unused
+- Dionysus bust — the 42 MB source `assets/dionysus-bust-source.glb` is
+  git-ignored: it stays on the owner's machine, is never deployed, and is not in
+  the repository, so keep a backup of it elsewhere. Its origin and license are
+  not recorded yet; add them here. `scripts/build-dionysus.mjs` drops the unused
   specular map and re-encodes the remaining 4K PNGs as WebP, emitting two
   variants: `dionysus-bust.glb` (1K maps, ~445 KB) and `dionysus-bust-mobile.glb`
   (512px maps, ~312 KB). `gate.ts` picks between them at `LAYOUT_BREAKPOINT`.
