@@ -1,0 +1,61 @@
+---
+import { services } from '../data/services';
+import Annotation from './Annotation.astro';
+import Arrow from './Arrow.astro';
+import SectionHead from './SectionHead.astro';
+---
+
+<section class="section" aria-labelledby="services-title">
+  <div class="container">
+    <!-- TODO(content-review): Confirm service scope, engagement boundaries, and conflict-of-interest constraints before deployment. -->
+    <SectionHead id="services-title" title="Engagements" />
+
+    <ul class="service-list" role="list">
+      {services.map((service) => (
+        <li data-reveal>
+          <a class="service" href={`/services/${service.slug}/`}>
+            <div class="service-main">
+              <h3>{service.title}</h3>
+              <p>{service.summary}</p>
+            </div>
+            <div class="service-side">
+              {service.fit[0] && <Annotation label="Good fit when" text={service.fit[0]} />}
+              <span class="service-cta">See the scope <span class="arrow" aria-hidden="true"><Arrow dir="right" /></span></span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .service-list { list-style: none; border-top: var(--hairline); }
+  .service-list li { border-bottom: var(--hairline); }
+  .service {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--col-gap);
+    align-items: start;
+    padding: clamp(1.5rem, 3vw, 2.25rem) 0;
+    transition: background-color 0.25s var(--ease-out);
+  }
+  .service:hover { background: color-mix(in srgb, var(--surface) 70%, transparent); }
+  h3 { font-size: var(--step-3); font-weight: 600; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 0.6rem; overflow-wrap: anywhere; }
+  .service-main p { max-width: 48ch; color: var(--text-2); font-size: var(--step-1); }
+  .service-side { display: flex; flex-direction: column; gap: 1.25rem; align-items: flex-start; }
+  .service-cta { display: inline-flex; gap: 0.5rem; color: var(--accent); font-weight: 500; }
+  .arrow { display: inline-block; transition: transform 0.25s var(--ease-out); }
+  .service:hover .arrow { transform: translateX(4px); }
+
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .service { grid-template-columns: 1fr; }
+    .service-side { grid-column: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arrow { transition: none; }
+    .service:hover .arrow { transform: none; }
+  }
+</style>

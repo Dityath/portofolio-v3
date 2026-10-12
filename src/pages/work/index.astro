@@ -1,0 +1,24 @@
+---
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import SelectedSystems from '../../components/SelectedSystems.astro';
+import { projects, yearSpan } from '../../data/projects';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Work — Ditya Athallah"
+  description="Case studies from Ditya Athallah’s work: geospatial dashboards, delivery leadership, hackathon builds, and design research."
+>
+  <Header />
+  <main id="main">
+    <PageIntro
+      title="Work"
+      lede="Five case studies. Each one starts with the question the project had to answer, then shows the move I made and what happened."
+      meta={`${projects.length} projects · ${yearSpan(projects)}`}
+    />
+    <SelectedSystems variant="all" />
+  </main>
+  <Footer />
+</BaseLayout>

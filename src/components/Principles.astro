@@ -1,0 +1,58 @@
+---
+import SectionHead from './SectionHead.astro';
+
+const principles = [
+  {
+    title: 'Show the reasoning, not just the result.',
+    body: 'Decisions that only live in someone’s head get re-made, badly. I write them down where the team can argue with them.',
+  },
+  {
+    title: 'Name the constraint before the solution.',
+    body: 'Deadlines, budgets, old code, and team size decide more than ideas do. Listing them early keeps the options honest.',
+  },
+  {
+    title: 'Calm beats clever.',
+    body: 'The best system is the one the team can still explain six months later.',
+  },
+];
+---
+
+<section class="section principles" aria-labelledby="principles-title">
+  <div class="container">
+    <SectionHead id="principles-title" title="How I work" />
+
+    <ul class="list">
+      {principles.map((p) => (
+        <li class="grid-12" data-reveal>
+          <h3>{p.title}</h3>
+          <p>{p.body}</p>
+        </li>
+      ))}
+    </ul>
+
+    <p class="pull" data-reveal>Good engineering optimizes for the <em>problem</em>, not the&nbsp;trend.</p>
+  </div>
+</section>
+
+<style>
+  .list { list-style: none; border-top: var(--hairline); }
+  .list li { border-bottom: var(--hairline); padding: 1.75rem 0; align-items: baseline; row-gap: 0.5rem; }
+  h3 { grid-column: 1 / span 6; font-size: var(--step-2); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+  li p { grid-column: 8 / span 5; color: var(--text-2); max-width: 60ch; }
+  .pull {
+    margin-top: var(--space-block);
+    max-width: 24ch;
+    font-size: var(--step-3);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    color: var(--text);
+  }
+  em { font-style: normal; color: var(--accent); }
+
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .list li { display: block; }
+    li p { margin-top: 0.5rem; }
+  }
+</style>

@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+.impeccable/review/
+.impeccable/live/
+.impeccable/mocks/
+.impeccable/config.local.json
+
+# Raw 42 MB bust export: kept local, out of git history. Only its processed
+# builds in public/models/ ship. See "Credits" in README.md.
+assets/dionysus-bust-source.glb

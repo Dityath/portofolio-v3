@@ -1,0 +1,30 @@
+---
+interface Props {
+  label: string;
+  text?: string;
+  align?: 'left' | 'right';
+}
+
+const { label, text, align = 'left' } = Astro.props;
+---
+
+<div class:list={['annotation', `is-${align}`]}>
+  <div class="line">
+    <span class="dot" aria-hidden="true"></span>
+    <span class="leader" aria-hidden="true"></span>
+    <span class="label mono">{label}</span>
+  </div>
+  {text && <p class="text">{text}</p>}
+</div>
+
+<style>
+  .annotation { display: flex; flex-direction: column; gap: 0.4rem; max-width: 28ch; }
+  .annotation.is-right { align-items: flex-end; text-align: right; }
+  .line { display: flex; align-items: center; }
+  .is-right .line { flex-direction: row-reverse; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--annotate); flex: none; }
+  .leader { width: 2rem; height: 1px; background: var(--annotate); flex: none; }
+  .label { color: var(--annotate); margin-inline: 0.6rem; }
+  .is-right .label { margin-inline: 0.6rem; }
+  .text { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+</style>

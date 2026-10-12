@@ -1,0 +1,953 @@
+---
+import { method } from '../data/method';
+import { site } from '../data/site';
+import Arrow from './Arrow.astro';
+
+// Small key drawn beside each figure caption: the same mark the chapter draws
+// on the bust, so the reader can match the words to the drawing.
+const glyphs: Record<string, string> = {
+  Frame: '<path class="g-a" d="M2 6V2H7M21 2H26V6M26 14V18H21M7 18H2V14" />',
+  Constrain:
+    '<path class="g-a" d="M2 3H26M2 17H26M6 3V5.5M11 3V5.5M16 3V5.5M21 3V5.5M6 17V14.5M11 17V14.5M16 17V14.5M21 17V14.5" />',
+  Decide:
+    '<path class="g-b" d="M2 10H8L13 4H22" /><path class="g-m" d="M8 10L13 16H19" /><rect class="g-b" x="22.5" y="1.5" width="4" height="5" />',
+  Build:
+    '<rect class="g-b" x="2" y="3" width="6" height="6" /><rect class="g-b g-on" x="11" y="3" width="6" height="6" /><rect class="g-b" x="20" y="3" width="6" height="6" /><rect class="g-b" x="2" y="12" width="6" height="6" /><rect class="g-b" x="11" y="12" width="6" height="6" /><rect class="g-b" x="20" y="12" width="6" height="6" />',
+};
+
+const [roleLead, ...roleRest] = site.role.split(' ');
+const roleTrail = roleRest.join(' ');
+
+const moves = method.slice(0, 4).map((step) => ({
+  index: step.index,
+  verb: step.verb,
+  line: `${step.title}.`,
+  body: step.body,
+  figure: step.figure,
+  artifact: step.artifact,
+  glyph: glyphs[step.verb] ?? '',
+}));
+
+// Labels for the two crown/shoulder anchors land in the left edge zone of the
+// stage, brow/mouth in the right one, so a tag never sits on the face.
+const sides = ['left', 'right', 'right', 'left'] as const;
+
+// Fixed positions on the poster image, as fractions of its width / height.
+// `Story.astro`'s script scales them to the poster's rendered rect; the same
+// values feed the no-JS CSS defaults below.
+const anchorFractions = [
+  [0.64, 0.045],
+  [0.6, 0.485],
+  [0.544, 0.582],
+  [0.27, 0.62],
+] as const;
+
+// Chapter drawings are authored once in poster-relative space (0–100 on both
+// axes of the poster image), so each one encloses or touches the head.
+const frame = `
+  <rect class="dash" x="24" y="0.5" width="56" height="64" />
+  <path class="solid" pathLength="1" d="M20 8V0H29M75 0H84V8M84 58V66H75M29 66H20V58" />`;
+
+const ticks = Array.from({ length: 13 }, (_, i) => 14 + i * 6);
+const constrain = `
+  <path class="solid" pathLength="1" d="M14 0H86M14 90H86" />
+  <path class="solid" pathLength="1" d="${ticks.map((x) => `M${x} 0V2.4M${x} 90V87.6`).join('')}" />`;
+
+// Decide: one connected fork, authored in 1% of poster height with its origin
+// at the mouth anchor (0,0). The script positions it from that anchor alone, so
+// it stays attached at every yaw. Trunk splits into the chosen branch (solid,
+// ends in a check) and the rejected one (dashed, shorter).
+const decide = `
+  <path class="solid" pathLength="1" d="M0 0L5 5L8 10H16" />
+  <path class="dash-b" d="M5 5L9 17H14.5" />
+  <rect class="solid check" x="16" y="8" width="4" height="4" />
+  <path class="solid check" d="M16.9 10.1L17.8 11L19.2 9"/>`;
+
+// Build: its own SVG with `meet`, so the cells stay true squares.
+const cols = 7;
+const rows = 5;
+const cells = Array.from({ length: cols * rows }, (_, i) => {
+  const c = i % cols;
+  const r = Math.floor(i / cols);
+  const on = i === 16 ? ' class="on"' : '';
+  return `<rect${on} x="${1 + c * 10}" y="${1 + r * 10}" width="8" height="8" />`;
+}).join('');
+
+const shapes = [frame, constrain];
+---
+
+<section
+  class="scene story"
+  data-scene
+  data-scene-target=".rail, .draw"
+  data-chapters="5"
+  data-chapter="0"
+  style="--scene-h: 600vh"
+  aria-labelledby="story-title"
+>
+  <a class="skip-link story-skip mono" href="#work">Skip to selected work</a>
+  <div class="scene-stage">
+    <div class="story-grid grid-12 container">
+      <div class="copy">
+        <div class="ch ch-0">
+          <!-- One role, set in two lines (solid, then outlined). The visible
+               name sits in the line below; the heading's accessible name
+               carries both. -->
+          <h1 class="display" id="story-title">
+            <span class="sr-only">{site.name}, {site.role}</span>
+            <span aria-hidden="true">{roleLead}</span>
+            <span class="outline" aria-hidden="true">{roleTrail}</span>
+          </h1>
+          <p class="line-0">I’m <strong>{site.name}</strong>. I design the thinking before the build.</p>
+          <p class="intro-story">A product takes its shape long before the first line of code. Here is how I find it, in four moves.</p>
+          <div class="actions">
+            <a class="btn btn--primary" href="#work">See the work <span class="btn-arrow" aria-hidden="true"><Arrow /></span></a>
+            <a class="btn btn--quiet" href="#contact">Say hello</a>
+          </div>
+        </div>
+
+        <!-- Visual chapter layers, motion mode only. Assistive tech reads the
+             `.moves` list below instead, once. -->
+        {moves.map((m, i) => (
+          <div class={`ch ch-${i + 1} move-live`} data-move={i + 1} aria-hidden="true">
+            <p class="verb">{m.verb}</p>
+            <p class="line">{m.line}</p>
+            <p class="body">{m.body}</p>
+            <p class="note">
+              <svg class="glyph" viewBox="0 0 28 20" fill="none" aria-hidden="true" set:html={m.glyph} />
+              <span>{m.figure}</span>
+            </p>
+            <p class="out"><span class="out-k mono">Leaves behind</span> <span class="out-v">{m.artifact}</span></p>
+          </div>
+        ))}
+
+        <!-- The four moves as text. Visible in static / reduced-motion mode
+             (beside the annotated bust); visually hidden but still read by
+             assistive tech while pinned. -->
+        <ol class="moves">
+          {moves.map((m) => (
+            <li class="move">
+              <p class="verb">{m.verb}</p>
+              <p class="line">{m.line}</p>
+              <p class="body">{m.body}</p>
+              <p class="note">
+                <svg class="glyph" viewBox="0 0 28 20" fill="none" aria-hidden="true" set:html={m.glyph} />
+                <span>{m.figure}</span>
+              </p>
+              <p class="out"><span class="out-k mono">Leaves behind</span> <span class="out-v">{m.artifact}</span></p>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="bust">
+        <div class="sculpture-stage" data-sculpture-stage>
+          <!-- Raster still of the same bust: the always-present static layer
+               (reduced motion, no JS, save-data, no WebGL). `gate.ts` may mount
+               a three.js canvas over it and set `.is-live`. -->
+          <div class="sculpture-fallback" aria-hidden="true">
+            <picture>
+              <source media="(max-width: 900px)" srcset="/images/bust-poster-mobile.webp" width="547" height="594" />
+              <img src="/images/bust-poster.webp" alt="" width="1094" height="1188" decoding="async" fetchpriority="low" />
+            </picture>
+          </div>
+          <div class="sculpture-shadow" aria-hidden="true"></div>
+
+          <div class="draw" aria-hidden="true">
+            <!-- Poster frame: a box with the poster's aspect ratio centred on the
+                 stage, so drawings are authored in poster coordinates. -->
+            <div class="pf">
+              <svg class="figure" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
+                {shapes.map((s, i) => <g class={`d d${i + 1}`} set:html={s} />)}
+              </svg>
+              <svg class="grid-fig" viewBox="0 0 70 50" preserveAspectRatio="xMidYMid meet" fill="none" set:html={cells} />
+            </div>
+
+            <svg class="fork" viewBox="0 0 1 1" fill="none">
+              <g class="d d3" set:html={decide} />
+            </svg>
+
+            {moves.map((m, i) => (
+              <div
+                class={`callout k${i + 1} is-${sides[i]}`}
+                style={`--fx: ${anchorFractions[i]?.[0]}; --fy: ${anchorFractions[i]?.[1]};`}
+              >
+                <span class="pt"></span>
+                <span class="lead"></span>
+                <span class="tag mono">{m.verb}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div class="cue" aria-hidden="true">
+        <span class="mono">Scroll</span>
+        <span class="cue-line"></span>
+      </div>
+
+      <!-- Pointer shortcut to each chapter. Hidden from assistive tech and
+           out of the tab order: the same moves are read from `.moves`, and the
+           skip link jumps past the story. -->
+      <ol class="rail" aria-hidden="true">
+        {['Intro', ...moves.map((m) => m.verb)].map((name, i) => (
+          <li class={`tick t${i}`} style={`--at: ${((i + 0.5) / 5) * 100}%`}>
+            <button class="tick-btn" type="button" tabindex="-1" data-to={i}>
+              <span class="mono tick-label">{name}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initScenes } from '../lib/scroll-scenes';
+  import './Sculpture/gate';
+
+  initScenes();
+
+  // ---- rail: click a chapter label to scroll to the middle of that chapter ----
+  const story = document.querySelector<HTMLElement>('.story[data-scene]');
+  story?.querySelector('.rail')?.addEventListener('click', (event) => {
+    const button = (event.target as Element).closest<HTMLElement>('[data-to]');
+    const stageEl = story.querySelector<HTMLElement>(':scope > .scene-stage');
+    if (!button || !stageEl) return;
+    const chapters = Number(story.dataset.chapters) || 1;
+    const i = Number(button.dataset.to) || 0;
+    const top = story.getBoundingClientRect().top + window.scrollY;
+    const travel = story.offsetHeight - stageEl.offsetHeight;
+    window.scrollTo({ top: top + ((i + 0.5) / chapters) * travel, behavior: 'smooth' });
+  });
+
+  // ---- callouts: transform-only, labels outside the silhouette ----
+  interface Pt {
+    x: number;
+    y: number;
+  }
+  interface AnchorDetail {
+    points: Pt[];
+    width: number;
+    height: number;
+  }
+
+  // Fixed fractions of the poster image (width, height): crown, brow, mouth, shoulder.
+  const FRACTIONS: ReadonlyArray<readonly [number, number]> = [
+    [0.64, 0.045],
+    [0.6, 0.485],
+    [0.544, 0.582],
+    [0.27, 0.62],
+  ];
+  const SIDES = ['left', 'right', 'right', 'left'] as const;
+  const PAD = 4;
+  const GAP = 12;
+  const LEAD_BASE = 100;
+
+  const stage = document.querySelector<HTMLElement>('[data-sculpture-stage]');
+  const draw = stage?.querySelector<HTMLElement>('.draw');
+  const poster = stage?.querySelector<HTMLImageElement>('.sculpture-fallback img');
+
+  if (stage && draw && poster) {
+    const items = [...draw.querySelectorAll<HTMLElement>('.callout')].map((el) => ({
+      el,
+      left: el.classList.contains('is-left'),
+      pt: el.querySelector<HTMLElement>('.pt'),
+      lead: el.querySelector<HTMLElement>('.lead'),
+      tag: el.querySelector<HTMLElement>('.tag'),
+      width: 0,
+    }));
+    // Narrow stage: no room right of the yawed hair for CONSTRAIN, so it goes left.
+    const narrow = window.matchMedia('(max-width: 900px)');
+    const sideFor = (i: number): boolean => (i === 1 && narrow.matches ? true : (SIDES[i] ?? 'left') === 'left');
+    const applySides = (): void => {
+      items.forEach((it, i) => {
+        it.left = sideFor(i);
+        it.el.classList.toggle('is-left', it.left);
+        it.el.classList.toggle('is-right', !it.left);
+      });
+    };
+    narrow.addEventListener('change', () => {
+      widthsStale = true;
+      applySides();
+      refresh();
+    });
+    draw.dataset.pos = 'js';
+
+    let live: AnchorDetail | null = null;
+    let widthsStale = true;
+
+    const measure = (): void => {
+      for (const it of items) it.width = it.tag?.offsetWidth ?? 0;
+      widthsStale = false;
+    };
+
+    applySides();
+    const pf = draw.querySelector<HTMLElement>('.pf');
+    const fork = draw.querySelector<SVGElement>('.fork');
+
+    /** Fit the drawings (poster-relative) onto the live bust: a uniform
+     *  scale + translate that best maps the poster anchors onto the live ones. */
+    const fit = (target: Pt[] | null, source: Pt[]): number => {
+      if (!pf) return 1;
+      const h = pf.offsetHeight || 1;
+      let s = 1;
+      let tx = 0;
+      let ty = 0;
+      if (target && target.length === source.length) {
+        const n = source.length;
+        const mean = (pts: Pt[]): Pt => ({
+          x: pts.reduce((a, p) => a + p.x, 0) / n,
+          y: pts.reduce((a, p) => a + p.y, 0) / n,
+        });
+        const pc = mean(source);
+        const lc = mean(target);
+        let num = 0;
+        let den = 0;
+        source.forEach((p, i) => {
+          const l = target[i];
+          if (!l) return;
+          num += (l.x - lc.x) * (p.x - pc.x) + (l.y - lc.y) * (p.y - pc.y);
+          den += (p.x - pc.x) ** 2 + (p.y - pc.y) ** 2;
+        });
+        s = den > 0 ? Math.min(2, Math.max(0.5, num / den)) : 1;
+        // Anchors are in stage px; the figure box's origin sits at its offset.
+        tx = lc.x - pf.offsetLeft - s * (pc.x - pf.offsetLeft);
+        ty = lc.y - pf.offsetTop - s * (pc.y - pf.offsetTop);
+      }
+      pf.style.transform = target ? `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0) scale(${s.toFixed(4)})` : '';
+      draw.style.setProperty('--sw', (100 / (h * s)).toFixed(4));
+      return s;
+    };
+
+    const place = (points: Pt[], stageWidth: number, ext: ReadonlyArray<number>): void => {
+      if (widthsStale) measure();
+      items.forEach((it, i) => {
+        const p = points[i];
+        if (!p || !it.pt || !it.lead || !it.tag) return;
+        const x = p.x.toFixed(1);
+        const y = p.y.toFixed(1);
+        let tagX: number;
+        let len: number;
+        if (it.left) {
+          tagX = PAD;
+          len = p.x - (PAD + it.width + GAP);
+        } else {
+          // Never closer to the dot than the silhouette / drawing extent `ext[i]`.
+          tagX = Math.min(Math.max(stageWidth - PAD - it.width, p.x + (ext[i] ?? 40)), stageWidth - it.width);
+          len = tagX - GAP - p.x;
+        }
+        // A negative scaleX grows the leader leftwards from the dot.
+        const scale = (it.left ? -1 : 1) * (Math.max(0, len) / LEAD_BASE);
+        it.pt.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        it.lead.style.transform = `translate3d(${x}px, ${y}px, 0) scaleX(${scale.toFixed(4)})`;
+        it.tag.style.transform = `translate3d(${tagX.toFixed(1)}px, calc(${y}px - 50%), 0)`;
+      });
+    };
+
+    const posterPoints = (): { points: Pt[]; width: number } | null => {
+      const st = stage.getBoundingClientRect();
+      const r = poster.getBoundingClientRect();
+      if (!r.width || !r.height) return null;
+      return {
+        width: st.width,
+        points: FRACTIONS.map(([fx, fy]) => ({
+          x: r.left - st.left + fx * r.width,
+          y: r.top - st.top + fy * r.height,
+        })),
+      };
+    };
+
+    /** Right-side label clearance from each anchor, in px: live = the yawed hair
+     *  reaches ~0.13 poster widths past the brow; static = the frame bracket
+     *  (x 84 of 100) and the fork. Left-side entries are unused. */
+    const clearance = (pw: number, isLive: boolean): number[] =>
+      isLive ? [0, pw * 0.13 + 14, pw * 0.06 + 14, 0] : [0, pw * 0.25 + 12, pw * 0.3 + 12, 0];
+
+    const refresh = (): void => {
+      const base = posterPoints();
+      if (!base) return;
+      const pw = poster.getBoundingClientRect().width;
+      const isLive = stage.dataset.anchors === 'live' && live;
+      const pts = isLive && live ? live.points : base.points;
+      place(pts, isLive && live ? live.width : base.width, clearance(pw, Boolean(isLive)));
+      const s = fit(isLive ? pts : null, base.points);
+      const a3 = pts[2];
+      if (fork && a3 && pf) {
+        const k = (pf.offsetHeight * s) / 100;
+        fork.style.transform = `translate3d(${a3.x.toFixed(1)}px, ${a3.y.toFixed(1)}px, 0) scale(${k.toFixed(4)})`;
+      }
+    };
+
+    stage.addEventListener('sculpture:anchors', (event) => {
+      live = (event as CustomEvent<AnchorDetail>).detail;
+      if (stage.dataset.anchors === 'live') refresh();
+    });
+    new MutationObserver(refresh).observe(stage, {
+      attributes: true,
+      attributeFilter: ['data-anchors'],
+    });
+    new ResizeObserver(() => {
+      widthsStale = true;
+      refresh();
+    }).observe(stage);
+    poster.addEventListener('load', refresh);
+    void document.fonts?.ready.then(() => {
+      widthsStale = true;
+      refresh();
+    });
+    refresh();
+  }
+
+</script>
+
+<style>
+  .story {
+    --fx1: 50%; --fy1: 12%;
+    --fx2: 60.6%; --fy2: 32%;
+    --fx3: 51.8%; --fy3: 47%;
+    --fx4: 36%; --fy4: 71.5%;
+    border-bottom: var(--hairline);
+  }
+
+  .story-grid { position: relative; align-items: center; height: 100%; }
+
+  /* Not inside the document-top skip link: hide with the visually-hidden
+     pattern until focused, then show as a box below the header. */
+  .story-skip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    transform: none;
+    transition: none;
+  }
+  .story-skip:focus-visible {
+    position: fixed;
+    top: calc(var(--header-h) + 0.75rem);
+    left: var(--gutter);
+    z-index: 30;
+    width: auto;
+    height: auto;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid var(--accent);
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    background: var(--surface);
+    color: var(--text);
+    transform: none;
+  }
+
+  /* ---------- type ---------- */
+  .display {
+    font-size: var(--step-5);
+    font-weight: 700;
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    margin-bottom: clamp(1.25rem, 3vh, 2rem);
+  }
+  .display span { display: block; }
+  .outline {
+    /* Stroke behind an opaque fill hides the variable font's overlapping
+       contours, leaving a clean outside contour. */
+    color: var(--bg);
+    -webkit-text-stroke: 3px var(--text-2);
+    paint-order: stroke fill;
+  }
+  @supports not (-webkit-text-stroke: 1px black) {
+    .outline { color: var(--text-2); }
+  }
+  .display span { white-space: nowrap; }
+
+  .line-0 {
+    max-width: 40ch;
+    color: var(--text-2);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+  }
+  .line-0 strong { color: var(--text); font-weight: 600; }
+  .intro-story {
+    max-width: 44ch;
+    color: var(--muted);
+    font-size: var(--step-0);
+    line-height: 1.6;
+    margin-bottom: clamp(1.5rem, 3.5vh, 2.25rem);
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+  .verb {
+    font-size: var(--step-5);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .line { font-size: var(--step-2); line-height: 1.25; color: var(--text); max-width: 24ch; text-wrap: balance; }
+  .body {
+    max-width: 44ch;
+    margin-top: 1rem;
+    color: var(--text-2);
+    font-size: var(--step-0);
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  /* What the bust drawing means: an annotation, so it speaks in amber, keyed
+     by a small copy of the same mark. */
+  .note {
+    display: grid;
+    grid-template-columns: 1.75rem 1fr;
+    column-gap: 0.75rem;
+    align-items: start;
+    max-width: 46ch;
+    margin-top: 1.25rem;
+    color: var(--annotate);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+  .glyph { width: 1.75rem; height: 1.25rem; margin-top: 0.1rem; overflow: visible; }
+  .glyph :global(.g-a) { stroke: var(--annotate); stroke-width: 1.25; }
+  .glyph :global(.g-b) { stroke: var(--accent); stroke-width: 1.25; }
+  .glyph :global(.g-m) { stroke: var(--border-strong); stroke-width: 1.25; stroke-dasharray: 2 2; }
+  .glyph :global(.g-on) { fill: var(--accent); }
+
+  .out {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 1rem;
+    row-gap: 0.25rem;
+    max-width: 46ch;
+    margin-top: 1.25rem;
+    padding-top: 0.75rem;
+    border-top: var(--hairline);
+    font-size: var(--step--1);
+  }
+  .out-k { color: var(--muted); font-size: 0.75rem; letter-spacing: 0.04em; }
+  .out-v { color: var(--text); }
+
+  /* ---------- layout ---------- */
+  .copy { grid-column: 1 / span 6; grid-row: 1; position: relative; z-index: 2; display: grid; align-items: center; }
+  .bust { grid-column: 6 / -1; grid-row: 1; position: relative; height: 100%; min-height: 24rem; }
+  .ch { grid-area: 1 / 1; }
+
+  .sculpture-stage { position: absolute; inset: 6% 0 4%; container-type: size; }
+  .sculpture-fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: opacity 0.8s var(--ease-out);
+  }
+  .sculpture-fallback picture { display: contents; }
+  .sculpture-fallback img { height: 100%; width: auto; max-width: none; flex: none; }
+  .sculpture-stage.is-live .sculpture-fallback { opacity: 0; }
+  .sculpture-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 4%;
+    z-index: 1;
+    width: 52%;
+    height: 2.5rem;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55) 0%, transparent 70%);
+    filter: blur(8px);
+  }
+
+  /* ---------- drawing layer ---------- */
+  .draw {
+    --ar: 0.9209; /* poster width / height */
+    --pad: 0.25rem;
+    --gap: 0.75rem;
+    --lw: 6rem;
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    contain: paint;
+  }
+  /* Poster frame: same box as the rendered poster image. */
+  .pf {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 100%;
+    aspect-ratio: 1094 / 1188;
+    margin-left: calc(var(--ar) * -50cqh);
+    transform-origin: 0 0;
+  }
+  .fork { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; display: none; transform-origin: 0 0; }
+  .draw[data-pos='js'] .fork { display: block; }
+  .figure { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  /* The figure box has the poster's aspect ratio, so its user units are
+     near-uniform. `--sw` (set by the script) is 1px expressed in those units;
+     no `non-scaling-stroke`, which breaks `pathLength` dashing. */
+  :is(.figure, .fork) :global(.solid) { stroke: var(--annotate); stroke-width: var(--sw, 0.15); }
+  :is(.figure, .fork) :global(.dash) { stroke: var(--annotate); stroke-width: var(--sw, 0.15); stroke-dasharray: calc(5 * var(--sw, 0.15)); }
+  :is(.figure, .fork) :global(.d3 .solid) { stroke: var(--accent); }
+  :is(.figure, .fork) :global(.dash-b) { stroke: var(--border-strong); stroke-width: var(--sw, 0.15); stroke-dasharray: calc(4 * var(--sw, 0.15)); }
+
+  /* Build grid: its own SVG, `meet`, so the cells are true squares. */
+  .grid-fig {
+    position: absolute;
+    left: 9%;
+    top: 66%;
+    width: 31%;
+    height: auto;
+    aspect-ratio: 70 / 50;
+    overflow: visible;
+  }
+  .grid-fig :global(rect) {
+    fill: none;
+    stroke: var(--accent);
+    stroke-opacity: 0.45;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+  .grid-fig :global(rect.on) { fill: var(--accent); stroke-opacity: 1; }
+
+  /* Callouts. Defaults below are the no-JS positions, derived from fixed
+     fractions of the poster; the script overrides every `transform` inline. */
+  .callout {
+    --dx: calc(50cqw + (var(--fx) - 0.5) * var(--ar) * 100cqh);
+    --dy: calc(var(--fy) * 100cqh);
+  }
+  .pt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: var(--annotate);
+    transform: translate3d(var(--dx), var(--dy), 0);
+  }
+  .pt::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--annotate) 28%, transparent);
+    opacity: 0;
+    transform: scale(0.4);
+    transition: transform 0.4s var(--ease-out), opacity 0.4s var(--ease-out);
+  }
+  .lead {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 1px;
+    background: var(--annotate);
+    transform-origin: 0 0;
+  }
+  .tag {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--annotate);
+    white-space: nowrap;
+  }
+  .callout.is-left .lead {
+    width: calc(var(--dx) - var(--pad) - var(--lw) - var(--gap));
+    transform: translate3d(var(--dx), var(--dy), 0) scaleX(-1);
+  }
+  .callout.is-right .lead {
+    width: calc(100cqw - var(--pad) - var(--lw) - var(--gap) - var(--dx));
+    transform: translate3d(var(--dx), var(--dy), 0);
+  }
+  .callout.is-left .tag {
+    width: var(--lw);
+    text-align: right;
+    transform: translate3d(var(--pad), calc(var(--dy) - 50%), 0);
+  }
+  .callout.is-right .tag {
+    width: var(--lw);
+    transform: translate3d(calc(100cqw - var(--pad) - var(--lw)), calc(var(--dy) - 50%), 0);
+  }
+  .draw[data-pos='js'] .callout .lead { width: 100px; }
+  .draw[data-pos='js'] .callout .tag { width: max-content; }
+
+  /* ---------- progress rail / cue ---------- */
+  .rail { display: none; }
+  .cue { display: none; }
+
+  /* ---------- the four moves (text) ---------- */
+  .moves { list-style: none; margin: 0; padding: 0; }
+  .move .verb { font-size: var(--step-4); margin-bottom: 0.4rem; }
+  .move .line { max-width: 32ch; }
+  .move .body { max-width: 52ch; }
+
+  /* ================= STATIC / ACCESSIBLE (no pinning) ================= */
+  :global(html:not([data-motion='on'])) .story .scene-stage { height: auto; }
+  :global(html:not([data-motion='on'])) .story-grid {
+    padding-block: clamp(2.5rem, 6vh, 4.5rem);
+    align-items: center;
+    row-gap: 2rem;
+  }
+  :global(html:not([data-motion='on'])) .story .copy { display: flex; flex-direction: column; align-items: stretch; }
+  :global(html:not([data-motion='on'])) .story .bust { height: min(72vh, 42rem); }
+  :global(html:not([data-motion='on'])) .story .move-live { display: none; }
+  /* One drawing set, not four stacked: the frame and the decision fork stay on
+     the bust; the rulers and the build grid are shown by each move's key
+     glyph instead, and the grid would bury the BUILD callout's dot. */
+  :global(html:not([data-motion='on'])) .story :is(.d2, .grid-fig) { display: none; }
+  :global(html:not([data-motion='on'])) .story .moves { margin-top: clamp(2rem, 5vh, 3rem); }
+  :global(html:not([data-motion='on'])) .story .move { padding-block: 1.1rem; border-top: var(--hairline); }
+  :global(html:not([data-motion='on'])) .story .move:last-child { border-bottom: var(--hairline); }
+
+  /* ================= PINNED ================= */
+  /* Visually hidden, still in the accessibility tree. */
+  :global(html[data-motion='on']) .story .moves {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+  :global(html[data-motion='on']) .story .scene-stage { border-top: 0; }
+
+  :global(html[data-motion='on']) .story .ch {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(24px);
+    transition:
+      opacity 0.5s var(--ease-out),
+      transform 0.5s var(--ease-out),
+      visibility 0s linear 0.5s;
+    align-self: center;
+  }
+  /* active layer */
+  :global(html[data-motion='on']) .story[data-chapter='0'] .ch-0,
+  :global(html[data-motion='on']) .story[data-chapter='1'] .ch-1,
+  :global(html[data-motion='on']) .story[data-chapter='2'] .ch-2,
+  :global(html[data-motion='on']) .story[data-chapter='3'] .ch-3,
+  :global(html[data-motion='on']) .story[data-chapter='4'] .ch-4 {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+  /* Inside the active chapter the lines arrive one after another: verb, claim,
+     story, what the drawing means, what it leaves behind. */
+  :global(html[data-motion='on']) .story .move-live > * {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.5s var(--ease-out),
+      transform 0.7s var(--ease-out);
+  }
+  .move-live > :nth-child(2) { --i: 1; }
+  .move-live > :nth-child(3) { --i: 2; }
+  .move-live > :nth-child(4) { --i: 3; }
+  .move-live > :nth-child(5) { --i: 4; }
+  :global(html[data-motion='on']) .story[data-chapter='1'] .ch-1 > *,
+  :global(html[data-motion='on']) .story[data-chapter='2'] .ch-2 > *,
+  :global(html[data-motion='on']) .story[data-chapter='3'] .ch-3 > *,
+  :global(html[data-motion='on']) .story[data-chapter='4'] .ch-4 > * {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(var(--i, 0) * 90ms + 60ms);
+  }
+
+  /* layers already passed leave upward */
+  :global(html[data-motion='on']) .story[data-chapter='1'] .ch-0,
+  :global(html[data-motion='on']) .story[data-chapter='2'] :is(.ch-0, .ch-1),
+  :global(html[data-motion='on']) .story[data-chapter='3'] :is(.ch-0, .ch-1, .ch-2),
+  :global(html[data-motion='on']) .story[data-chapter='4'] :is(.ch-0, .ch-1, .ch-2, .ch-3) {
+    transform: translateY(-24px);
+  }
+
+  /* scroll cue */
+  :global(html[data-motion='on']) .story .cue {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: absolute;
+    left: 50%;
+    bottom: 1.5rem;
+    transform: translateX(-50%);
+    color: var(--muted);
+    z-index: 5;
+    transition: opacity 0.5s var(--ease-out);
+  }
+  :global(html[data-motion='on']) .story:not([data-chapter='0']) .cue { opacity: 0; }
+  .cue-line { display: block; width: 1px; height: 2.5rem; background: var(--border-strong); transform-origin: top; animation: cue 2.2s var(--ease-out) infinite; }
+  @keyframes cue {
+    0% { transform: scaleY(0); opacity: 1; }
+    70% { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(1); opacity: 0; }
+  }
+
+  /* rail */
+  :global(html[data-motion='on']) .story .rail {
+    display: block;
+    position: absolute;
+    left: calc(var(--gutter) * -0.6);
+    top: 8%;
+    bottom: 8%;
+    width: 1px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--border);
+    z-index: 4;
+  }
+  :global(html[data-motion='on']) .story .rail::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleY(var(--p, 0));
+    transform-origin: top;
+  }
+  .tick { position: absolute; left: -3px; top: var(--at); width: 15px; height: 1px; }
+  .tick::before { content: ''; position: absolute; inset: 0; background: var(--border-strong); transform: scaleX(0.467); transform-origin: left; transition: background-color 0.3s var(--ease-out), transform 0.3s var(--ease-out); }
+  .tick-btn {
+    position: absolute;
+    left: -0.5rem;
+    top: 50%;
+    width: 1.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+  .tick-btn:hover .tick-label { color: var(--text); }
+  .tick-label { position: absolute; left: 1.6rem; top: 50%; transform: translateY(-50%); color: var(--muted); display: none; transition: color 0.3s var(--ease-out); }
+  :global(html[data-motion='on']) .story[data-chapter='0'] .t0::before,
+  :global(html[data-motion='on']) .story[data-chapter='1'] .t1::before,
+  :global(html[data-motion='on']) .story[data-chapter='2'] .t2::before,
+  :global(html[data-motion='on']) .story[data-chapter='3'] .t3::before,
+  :global(html[data-motion='on']) .story[data-chapter='4'] .t4::before { background: var(--accent); transform: scaleX(1); }
+  :global(html[data-motion='on']) .story[data-chapter='0'] .t0 .tick-label,
+  :global(html[data-motion='on']) .story[data-chapter='1'] .t1 .tick-label,
+  :global(html[data-motion='on']) .story[data-chapter='2'] .t2 .tick-label,
+  :global(html[data-motion='on']) .story[data-chapter='3'] .t3 .tick-label,
+  :global(html[data-motion='on']) .story[data-chapter='4'] .t4 .tick-label { color: var(--accent); }
+
+  /* callouts: all four at low emphasis in the intro; then the active one is
+     emphasised and the rest dimmed (passed ones included) */
+  :global(html[data-motion='on']) .story .callout { opacity: 0.6; transition: opacity 0.5s var(--ease-out); }
+  :global(html[data-motion='on']) .story:not([data-chapter='0']) .callout { opacity: 0.5; }
+  :global(html[data-motion='on']) .story[data-chapter='1'] .k1,
+  :global(html[data-motion='on']) .story[data-chapter='2'] .k2,
+  :global(html[data-motion='on']) .story[data-chapter='3'] .k3,
+  :global(html[data-motion='on']) .story[data-chapter='4'] .k4 { opacity: 1; }
+  :global(html[data-motion='on']) .story[data-chapter='1'] .k1 .pt::after,
+  :global(html[data-motion='on']) .story[data-chapter='2'] .k2 .pt::after,
+  :global(html[data-motion='on']) .story[data-chapter='3'] .k3 .pt::after,
+  :global(html[data-motion='on']) .story[data-chapter='4'] .k4 .pt::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* Build: once the mesh has dissolved, the inactive callouts fade out so no
+     leader ends in the point cloud. */
+  :global(html[data-motion='on']) .story[data-chapter='4'] .callout:not(.k4) {
+    opacity: clamp(0, calc(0.5 - (var(--cp, 0) - 0.15) * 1.6), 0.5);
+  }
+
+  /* chapter drawings: scrubbed by --cp while active, hidden otherwise */
+  :global(html[data-motion='on']) .story :is(.figure, .fork) :global(.d) { opacity: 0; transition: opacity 0.5s var(--ease-out); }
+  :global(html[data-motion='on']) .story :is(.figure, .fork) :global(.solid) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  :global(html[data-motion='on']) .story :is(.figure, .fork) :global(.dash),
+  :global(html[data-motion='on']) .story :is(.figure, .fork) :global(.dash-b) { opacity: 0; transition: opacity 0.4s var(--ease-out); }
+  :global(html[data-motion='on']) .story :is(.figure, .fork) :global(.check) { opacity: 0; stroke-dasharray: none; stroke-dashoffset: 0; transition: opacity 0.4s var(--ease-out); }
+
+  :global(html[data-motion='on']) .story[data-chapter='1'] :is(.figure, .fork) :global(.d1),
+  :global(html[data-motion='on']) .story[data-chapter='2'] :is(.figure, .fork) :global(.d2),
+  :global(html[data-motion='on']) .story[data-chapter='3'] :is(.figure, .fork) :global(.d3) { opacity: 1; }
+  :global(html[data-motion='on']) .story[data-chapter='1'] :is(.figure, .fork) :global(.d1 .solid),
+  :global(html[data-motion='on']) .story[data-chapter='2'] :is(.figure, .fork) :global(.d2 .solid),
+  :global(html[data-motion='on']) .story[data-chapter='3'] :is(.figure, .fork) :global(.d3 .solid:not(.check)) {
+    stroke-dashoffset: calc(1 - min(1, var(--cp, 0) * 1.6));
+  }
+  :global(html[data-motion='on']) .story[data-chapter='1'] :is(.figure, .fork) :global(.d1 .dash),
+  :global(html[data-motion='on']) .story[data-chapter='3'] :is(.figure, .fork) :global(.d3 .dash-b) { opacity: 1; transition-delay: 0.2s; }
+  :global(html[data-motion='on']) .story[data-chapter='3'] :is(.figure, .fork) :global(.d3 .check) {
+    opacity: 1;
+    transition-delay: 0.6s;
+  }
+  /* Build: the grid settles in as the point dissolve completes (~cp 0.5). */
+  :global(html[data-motion='on']) .story .grid-fig { opacity: 0; }
+  :global(html[data-motion='on']) .story[data-chapter='4'] .grid-fig {
+    opacity: clamp(0, calc((var(--cp, 0) - 0.35) * 5), 1);
+  }
+
+  /* ================= MOBILE ================= */
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .copy, .bust { grid-column: 1 / -1; grid-row: auto; }
+    .draw { --lw: 4.75rem; --gap: 0.5rem; }
+    /* Capped by screen height so the name and role still land on the first
+       screen of a short phone or a landscape one. */
+    :global(html:not([data-motion='on'])) .story .bust { height: min(22rem, 40svh); min-height: 10rem; order: -1; }
+    :global(html[data-motion='on']) .story-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding-inline: 0;
+    }
+    /* Pinned on a phone (only when the screen is at least 600px tall, see
+       MOTION_QUERY): a shorter bust and tighter type, so the longest chapter
+       fits in the copy area without clipping. */
+    :global(html[data-motion='on']) .story .bust { order: -1; flex: 0 0 36%; height: 36%; min-height: 0; }
+    :global(html[data-motion='on']) .story .copy { flex: 1; align-items: start; padding-top: 0.25rem; }
+    :global(html[data-motion='on']) .story .ch { align-self: start; }
+    :global(html[data-motion='on']) .story .rail,
+    :global(html[data-motion='on']) .story .cue { display: none; }
+    :global(html[data-motion='on']) .story .verb { font-size: var(--step-3); margin-bottom: 0.25rem; }
+    :global(html[data-motion='on']) .story .line { font-size: var(--step-1); }
+    :global(html[data-motion='on']) .story .body { margin-top: 0.5rem; font-size: 0.875rem; line-height: 1.5; }
+    :global(html[data-motion='on']) .story :is(.note, .out) { margin-top: 0.75rem; }
+    :global(html[data-motion='on']) .story .out { padding-top: 0.5rem; }
+    :global(html[data-motion='on']) .story .intro-story { font-size: 0.9375rem; margin-bottom: 1.25rem; }
+    .sculpture-stage { inset: 6% 0 2%; }
+    .display { font-size: var(--step-4); margin-bottom: 0.75rem; }
+    .verb { font-size: var(--step-4); }
+    .line-0 { font-size: var(--step-0); }
+  }
+  @media (min-width: 901px) {
+    :global(html[data-motion='on']) .story .copy { padding-left: 1.5rem; }
+    /* Static: the copy column runs long, so the annotated bust stays in view
+       beside whichever move is being read. Sticky, not animated. */
+    :global(html:not([data-motion='on'])) .story .bust {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+      align-self: start;
+    }
+  }
+  @media (min-width: 1200px) {
+    :global(html[data-motion='on']) .story .tick-label { display: block; }
+    :global(html[data-motion='on']) .story .copy { padding-left: 8rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cue-line { animation: none; transform: none; }
+    .sculpture-fallback { transition: none; }
+  }
+</style>

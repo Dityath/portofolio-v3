@@ -1,0 +1,144 @@
+---
+import { experience, type Phase, phases } from '../data/experience';
+import Arrow from './Arrow.astro';
+
+const order: Phase[] = ['design', 'build', 'lead'];
+// Earliest start per phase. Lead is measured from when it became the main role
+// (after the last non-lead role began); otherwise it would collapse onto Build.
+const startYear = (e: { start: string }) => Number(e.start.slice(0, 4));
+const lastOther = Math.max(
+  ...experience.filter((e) => e.phase !== 'lead').map((e) => Number(e.start.replace('-', ''))),
+);
+const stations = order.map((key, i) => ({
+  key,
+  label: phases[key].label,
+  line: phases[key].line,
+  year: Math.min(
+    ...experience
+      .filter(
+        (e) => e.phase === key && (key !== 'lead' || Number(e.start.replace('-', '')) >= lastOther),
+      )
+      .map(startYear),
+  ),
+  at: i / order.length,
+}));
+---
+
+<section class="path scene" data-scene data-scene-target=".rail-line, .station" style="--scene-h: 220vh" aria-labelledby="path-title">
+  <div class="scene-stage">
+    <div class="container stage-inner">
+      <h2 id="path-title">How I got here</h2>
+      <div class="track">
+        <svg class="rail rail--h" viewBox="0 0 100 1" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path class="rail-line" d="M0 0.5 H100" pathLength="1" />
+        </svg>
+        <svg class="rail rail--v" viewBox="0 0 1 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path class="rail-line" d="M0.5 0 V100" pathLength="1" />
+        </svg>
+        <ol class="stations">
+          {stations.map((s) => (
+            <li class="station" style={`--at: ${s.at.toFixed(4)}`}>
+              <span class="pip" aria-hidden="true"></span>
+              <p class="word">{s.label}</p>
+              <p class="year mono">{s.year}</p>
+              <p class="line">{s.line}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <p class="more"><a class="link-arrow" href="/about/">Full background <span aria-hidden="true"><Arrow dir="right" /></span></a></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initScenes } from '../lib/scroll-scenes';
+  initScenes();
+</script>
+
+<style>
+  /* --p is written by scroll-scenes only to the data-scene-target descendants,
+     so the progress variable and --draw live on those elements, not the root. */
+  .path { border-top: var(--hairline); }
+  .rail-line,
+  .station {
+    --draw: clamp(0, (var(--p, 1) - 0.08) / 0.72, 1);
+  }
+  .stage-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(2.5rem, 7vh, 4.5rem);
+    padding-block: var(--space-block);
+  }
+  h2 { font-size: var(--step-4); font-weight: 600; line-height: 1; letter-spacing: -0.035em; }
+
+  .track { position: relative; }
+  .rail { position: absolute; overflow: visible; pointer-events: none; }
+  .rail--h { display: block; top: 0; left: 0; width: 100%; height: 1px; }
+  .rail--v { display: none; top: 0; left: 0; width: 1px; height: 100%; }
+  .rail-line {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--draw));
+  }
+
+  .stations { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); column-gap: var(--col-gap); }
+  .station {
+    --s: clamp(0, (var(--draw) - var(--at)) / 0.14, 1);
+    position: relative;
+    padding-top: 2rem;
+    padding-right: 1rem;
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+  }
+  .pip {
+    position: absolute; top: -4px; left: 0; width: 9px; height: 9px;
+    background: var(--accent);
+    transform: scale(var(--s));
+  }
+  .word {
+    font-size: var(--step-5); font-weight: 700; line-height: 1.05; letter-spacing: -0.04em;
+    color: var(--text);
+    clip-path: inset(calc((1 - var(--s)) * 100%) 0 0 0);
+  }
+  .year { color: var(--accent); font-size: var(--step--1); opacity: var(--s); }
+  .line {
+    color: var(--text-2); max-width: 26ch;
+    opacity: var(--s);
+    transform: translateY(calc((1 - var(--s)) * 0.5em));
+  }
+  .more { align-self: flex-start; }
+
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .rail--h { display: none; }
+    .rail--v { display: block; }
+    .stations { grid-template-columns: 1fr; grid-auto-rows: 1fr; row-gap: 1.25rem; }
+    .station { padding: 0 0 0 2rem; gap: 0.25rem; }
+    .pip { top: 0.6rem; left: -4px; }
+    .word { font-size: var(--step-4); }
+    .stage-inner { gap: 1.5rem; }
+  }
+
+  /* Short viewports or narrow screens: the pinned stage can clip its stacked
+     content, so drop the pin and show the static presentation (line drawn,
+     every station visible). */
+  @media (max-width: 900px), (max-height: 700px) {
+    html[data-motion="on"] .path { height: auto; }
+    html[data-motion="on"] .path .scene-stage {
+      position: relative;
+      top: auto;
+      height: auto;
+      overflow: visible;
+    }
+    .rail-line,
+    .station {
+      --draw: 1;
+    }
+  }
+</style>

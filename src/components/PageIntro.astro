@@ -1,0 +1,48 @@
+---
+interface Props {
+  title: string;
+  lede: string;
+  meta?: string;
+}
+
+const { title, lede, meta } = Astro.props;
+---
+
+<section class="page-intro">
+  <div class="container" data-reveal>
+    <span class="tick" aria-hidden="true"></span>
+    <h1>{title}</h1>
+    <p class="lede">{lede}</p>
+    {meta && <p class="mono meta">{meta}</p>}
+  </div>
+</section>
+
+<style>
+  .page-intro {
+    padding: clamp(3.5rem, 9vw, 7rem) 0 clamp(3rem, 6vw, 5rem);
+    border-bottom: var(--hairline);
+  }
+  .tick {
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+  h1 {
+    max-width: 100%;
+    font-size: var(--step-5);
+    font-weight: 700;
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+  .lede {
+    max-width: 46ch;
+    margin-top: 1.75rem;
+    color: var(--text-2);
+    font-size: var(--step-1);
+  }
+  .meta { margin-top: 1.5rem; color: var(--muted); }
+</style>

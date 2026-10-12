@@ -1,0 +1,49 @@
+---
+import { experience } from '../data/experience';
+import { site } from '../data/site';
+import SectionHead from './SectionHead.astro';
+
+const current = experience[0];
+---
+
+<section class="section about" aria-labelledby="story-title">
+  <div class="container">
+    <SectionHead id="story-title" title="The short version" />
+
+    <div class="grid-12 story">
+      <dl class="facts mono" data-reveal>
+        <div><dt>Based in</dt><dd>{site.location}</dd></div>
+        <div><dt>Building since</dt><dd>2018</dd></div>
+        <div><dt>Now</dt><dd>{current ? `${current.role}, ${current.organisation}` : site.role}</dd></div>
+        <div><dt>Recognition</dt><dd>1st place, Devday Hackathon 2021</dd></div>
+      </dl>
+
+      <div class="prose copy" data-reveal>
+        <p>
+          I’ve been building for the web since 2018. The work that stuck with me was always about the reasoning: why this screen, why this stack, why now.
+        </p>
+        <p>
+          Design work taught me to frame a problem for the people who have it. Frontend and full-stack work taught me what each decision costs to build. Managing delivery on SEAN-CSO taught me that most problems live between management and developers.
+        </p>
+        <p>
+          Today I lead technical delivery across web, mobile, and computer-vision work at Nusapala Berkah Autonomous, after project-engineering and UI/UX roles at ABAROBOTICS.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .facts { grid-column: 1 / span 3; display: grid; gap: 1.25rem; align-content: start; }
+  .facts div { border-top: var(--hairline); padding-top: 0.75rem; }
+  .facts dt { color: var(--muted); }
+  .facts dd { margin-top: 0.25rem; color: var(--text-2); }
+  .copy { grid-column: 4 / span 8; font-size: var(--step-1); color: var(--text-2); }
+  .copy p { color: var(--text-2); }
+  .copy p:first-child { color: var(--text); }
+
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .story { display: flex; flex-direction: column-reverse; gap: 2.5rem; }
+  }
+</style>

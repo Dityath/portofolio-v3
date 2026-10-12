@@ -1,0 +1,128 @@
+---
+import Arrow from '../../components/Arrow.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { type Service, services } from '../../data/services';
+import { site } from '../../data/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return services.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+}
+
+interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+const others = services.filter((item) => item.slug !== service.slug);
+---
+
+<BaseLayout title={`${service.title} — Ditya Athallah`} description={service.description}>
+  <Header />
+  <main id="main" class="record">
+    <article class="container">
+      <a class="back link-arrow" href="/services/"><span aria-hidden="true"><Arrow dir="left" /></span> All services</a>
+
+      <header class="record-head" data-reveal>
+        <h1>{service.title}</h1>
+        <p class="lede">{service.description}</p>
+      </header>
+
+      <div class="blocks">
+        <section class="block" aria-labelledby="fit-title" data-reveal>
+          <h2 id="fit-title">Good fit when</h2>
+          <ul class="plain" role="list">
+            {service.fit.map((item) => <li><p>{item}</p></li>)}
+          </ul>
+        </section>
+
+        <section class="block" aria-labelledby="get-title" data-reveal>
+          <h2 id="get-title">What you get</h2>
+          <ol class="plain" role="list">
+            {service.deliverables.map((item, index) => (
+              <li class="indexed">
+                <span class="mono">{String(index + 1).padStart(2, '0')}</span>
+                <p>{item}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section class="block" aria-labelledby="covers-title" data-reveal>
+          <h2 id="covers-title">What it covers</h2>
+          <ul class="plain" role="list">
+            {service.areas.map((item) => <li><p>{item}</p></li>)}
+          </ul>
+        </section>
+
+        <section class="block" aria-labelledby="runs-title" data-reveal>
+          <h2 id="runs-title">How it runs</h2>
+          <div class="plain"><p class="run">{service.format}</p></div>
+        </section>
+      </div>
+
+      <section class="cta" aria-labelledby="cta-title" data-reveal>
+        <h2 id="cta-title">Start with a short note.</h2>
+        <div class="cta-body">
+          <p>Tell me where the product is and what feels stuck. I’ll reply with whether this engagement fits, or what would.</p>
+          <div class="cta-actions">
+            <a class="btn btn--primary" href={`mailto:${site.email}?subject=${encodeURIComponent(service.title)}`}>
+              Email about {service.title} <span class="btn-arrow" aria-hidden="true"><Arrow dir="right" /></span>
+            </a>
+            <p class="others">
+              Also:{" "}
+              {others.map((item, index) => (
+                <>
+                  {index > 0 && ' · '}
+                  <a href={`/services/${item.slug}/`}>{item.title}</a>
+                </>
+              ))}
+            </p>
+          </div>
+        </div>
+      </section>
+    </article>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .record { padding: var(--space-page-top, clamp(3rem, 7vw, 6rem)) 0 var(--space-section); }
+  .back { display: inline-flex; align-items: center; min-block-size: 2.75rem; margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+  .back > span { transition: transform 0.25s var(--ease-out); }
+  .back:hover > span { transform: translateX(-4px); }
+  .record-head { max-width: 68rem; }
+  h1 { margin-top: 1rem; font-size: var(--step-5); font-weight: 700; line-height: 0.96; letter-spacing: -0.04em; text-transform: uppercase; overflow-wrap: anywhere; }
+  .lede { max-width: 60ch; margin-top: 1.5rem; color: var(--text-2); font-size: var(--step-1); }
+
+  .blocks { margin-top: var(--space-block); }
+  .block, .cta { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--col-gap); padding: clamp(2rem, 4vw, 3rem) 0; border-top: var(--hairline); }
+  h2 { grid-column: 1 / span 4; font-size: var(--step-2); font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; }
+  .plain { grid-column: 5 / span 8; list-style: none; }
+  .plain li { padding: 0.9rem 0; border-bottom: var(--hairline); }
+  .plain li:first-child { padding-top: 0; }
+  .plain li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .plain p { max-width: 62ch; color: var(--text-2); font-size: var(--step-1); }
+  .indexed { display: grid; grid-template-columns: 3rem 1fr; gap: 1rem; align-items: baseline; }
+  .indexed .mono { color: var(--accent); }
+
+  .cta { border-top: 1px solid var(--border-strong); }
+  .cta-body { grid-column: 5 / span 8; }
+  .cta-body > p { max-width: 55ch; color: var(--text-2); font-size: var(--step-1); }
+  .cta-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem 2rem; margin-top: 1.75rem; }
+  .others { color: var(--muted); }
+  .others a { color: var(--text-2); text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: currentColor; }
+  .others a:hover { color: var(--accent); }
+
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .block, .cta { display: block; }
+    h2 { margin-bottom: 1.25rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .back > span { transition: none; }
+    .back:hover > span { transform: none; }
+  }
+</style>

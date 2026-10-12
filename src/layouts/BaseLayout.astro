@@ -1,0 +1,160 @@
+---
+import '../styles/global.css';
+import monoLatin400 from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url';
+import monoLatin500 from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2?url';
+import monoLatinExt400 from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-ext-400-normal.woff2?url';
+import monoLatinExt500 from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-ext-500-normal.woff2?url';
+import interLatinExt from '@fontsource-variable/inter-tight/files/inter-tight-latin-ext-wght-normal.woff2?url';
+// Fontsource's package-level entrypoints declare every subset it ships
+// (cyrillic, greek, vietnamese, …). Browsers only fetch the unicode-ranges a
+// page actually uses, but the @font-face rules themselves still ship. Declaring
+// the two subsets this site needs by hand keeps the CSS small and, more
+// importantly, lets us preload the exact files the first paint depends on.
+import interLatin from '@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2?url';
+import { MOTION_QUERY } from '../constants';
+import { site } from '../data/site';
+
+const LATIN =
+  'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
+const LATIN_EXT =
+  'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF';
+
+const fontFaces = `
+@font-face { font-family: 'Inter Tight Variable'; font-style: normal; font-display: swap; font-weight: 100 900; src: url(${interLatinExt}) format('woff2-variations'); unicode-range: ${LATIN_EXT}; }
+@font-face { font-family: 'Inter Tight Variable'; font-style: normal; font-display: swap; font-weight: 100 900; src: url(${interLatin}) format('woff2-variations'); unicode-range: ${LATIN}; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 400; src: url(${monoLatinExt400}) format('woff2'); unicode-range: ${LATIN_EXT}; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 400; src: url(${monoLatin400}) format('woff2'); unicode-range: ${LATIN}; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 500; src: url(${monoLatinExt500}) format('woff2'); unicode-range: ${LATIN_EXT}; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 500; src: url(${monoLatin500}) format('woff2'); unicode-range: ${LATIN}; }
+`.trim();
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og.png', Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0F1115" />
+    <meta name="color-scheme" content="dark" />
+    <script is:inline define:vars={{ motionQuery: MOTION_QUERY }}>
+      (() => {
+        const root = document.documentElement;
+        root.dataset.js = '';
+        // Pin and animate only with motion allowed and enough height for a
+        // pinned chapter to fit; short screens (small phones, landscape) get
+        // the static composition. Mirrors MOTION_QUERY in src/constants.ts.
+        const mq = window.matchMedia(motionQuery);
+        let failed = false;
+        const sync = () => {
+          if (mq.matches && !failed) root.dataset.motion = 'on';
+          else delete root.dataset.motion;
+        };
+        sync();
+        mq.addEventListener('change', sync);
+        // Safety net: the bundled scripts mark themselves ready. If they never
+        // do (blocked, failed to load, threw), stop hiding content behind them:
+        // reveals show, menus render open-flow, scenes fall back to static.
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            const scenesOk = !document.querySelector('[data-scene]') || 'scenes' in root.dataset;
+            if ('ready' in root.dataset && scenesOk) return;
+            failed = true;
+            root.dataset.fallback = '';
+            delete root.dataset.js;
+            sync();
+          }, 3000);
+        });
+      })();
+    </script>
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.handle} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name}, ${site.role}`} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- The display face sets a 9rem headline; without a preload it lands well
+         after first paint and the hero visibly reflows. -->
+    <link rel="preload" as="font" type="font/woff2" href={interLatin} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={monoLatin400} crossorigin />
+    <style set:html={fontFaces}></style>
+  </head>
+  <body>
+    <a class="skip-link mono" href="#main">Skip to content</a>
+    <slot />
+    <script>
+      const targets = document.querySelectorAll('[data-reveal]');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduce) {
+        targets.forEach((el) => el.classList.add('is-in'));
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in');
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
+        );
+        targets.forEach((el) => io.observe(el));
+      }
+
+      // In-page links jump instantly: on the home page a smooth scroll would
+      // play several screens of pinned animation on the way. The history entry
+      // is pushed before scrolling, so Back returns to where the reader was.
+      document.addEventListener('click', (event) => {
+        if (event.defaultPrevented || event.button !== 0) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href*="#"]');
+        if (!link || (link.target && link.target !== '_self')) return;
+        const url = new URL(link.href, window.location.href);
+        if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return;
+        const id = decodeURIComponent(url.hash.slice(1));
+        const target = id ? document.getElementById(id) : null;
+        if (!target) return;
+        event.preventDefault();
+        if (window.location.hash !== url.hash) history.pushState(null, '', url.hash);
+        target.scrollIntoView({ behavior: 'instant', block: 'start' });
+        const focusable =
+          target.tagName === 'SECTION' ? (target.querySelector<HTMLElement>('h1, h2') ?? target) : target;
+        if (!focusable.matches('a[href], button, input, select, textarea, [tabindex]')) {
+          focusable.setAttribute('tabindex', '-1');
+        }
+        focusable.focus({ preventScroll: true });
+      });
+
+      document.documentElement.dataset.ready = '';
+    </script>
+  </body>
+</html>

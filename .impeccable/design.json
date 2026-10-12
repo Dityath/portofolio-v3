@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-11T18:52:28Z",
+  "title": "Design System: Dityath / Workspace",
+  "extensions": {
+    "colorMeta": {
+      "graphite-ground": {
+        "role": "neutral",
+        "displayName": "Graphite Ground",
+        "canonical": "#0f1115",
+        "cssVar": "--bg",
+        "tonalRamp": [
+          "#191d24",
+          "#2f3541",
+          "#444d5f",
+          "#606c86",
+          "#828ea6",
+          "#a6aebf",
+          "#c9cfd9",
+          "#edeff2"
+        ]
+      },
+      "drafting-surface": {
+        "role": "neutral",
+        "displayName": "Drafting Surface",
+        "canonical": "#171a21",
+        "cssVar": "--surface",
+        "tonalRamp": [
+          "#191c24",
+          "#2e3442",
+          "#434c60",
+          "#5e6b87",
+          "#818ca7",
+          "#a5adc0",
+          "#c9ced9",
+          "#edeff2"
+        ]
+      },
+      "drafting-surface-raised": {
+        "role": "neutral",
+        "displayName": "Drafting Surface Raised",
+        "canonical": "#1c2029",
+        "cssVar": "--surface-2",
+        "tonalRamp": [
+          "#191c24",
+          "#2e3443",
+          "#424c61",
+          "#5d6a88",
+          "#808ca8",
+          "#a4adc1",
+          "#c8ceda",
+          "#edeff3"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#262b35",
+        "cssVar": "--border",
+        "tonalRamp": [
+          "#1a1d24",
+          "#2f3541",
+          "#444d5f",
+          "#606c86",
+          "#828ea6",
+          "#a6aebf",
+          "#cacfd9",
+          "#edeff2"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Hairline Strong",
+        "canonical": "#333b49",
+        "cssVar": "--border-strong",
+        "tonalRamp": [
+          "#191d24",
+          "#2e3542",
+          "#434e60",
+          "#5e6d87",
+          "#818fa7",
+          "#a5afc0",
+          "#c9cfd9",
+          "#edeff2"
+        ]
+      },
+      "control-edge": {
+        "role": "neutral",
+        "displayName": "Control Edge",
+        "canonical": "#5b6474",
+        "cssVar": "--border-control",
+        "tonalRamp": [
+          "#1b1e22",
+          "#31363f",
+          "#484f5b",
+          "#656f81",
+          "#8790a1",
+          "#a9b0bc",
+          "#ccd0d7",
+          "#eeeff2"
+        ]
+      },
+      "chalk-text": {
+        "role": "neutral",
+        "displayName": "Chalk Text",
+        "canonical": "#f4f7fb",
+        "cssVar": "--text",
+        "tonalRamp": [
+          "#101d2d",
+          "#1e3452",
+          "#2c4c78",
+          "#3d6ba8",
+          "#628dc6",
+          "#8fadd6",
+          "#bccee7",
+          "#e9eff7"
+        ]
+      },
+      "graphite-text": {
+        "role": "neutral",
+        "displayName": "Graphite Text",
+        "canonical": "#a3acba",
+        "cssVar": "--text-2",
+        "tonalRamp": [
+          "#1a1e23",
+          "#303640",
+          "#464f5d",
+          "#626f83",
+          "#8591a3",
+          "#a8b0bd",
+          "#cbd0d8",
+          "#eeeff2"
+        ]
+      },
+      "muted-graphite": {
+        "role": "neutral",
+        "displayName": "Muted Graphite",
+        "canonical": "#7a8391",
+        "cssVar": "--muted",
+        "tonalRamp": [
+          "#1c1e21",
+          "#33373d",
+          "#4a5059",
+          "#68707e",
+          "#8a929e",
+          "#abb1ba",
+          "#cdd0d5",
+          "#eeeff1"
+        ]
+      },
+      "blueprint-blue": {
+        "role": "primary",
+        "displayName": "Blueprint Blue",
+        "canonical": "#4c8dff",
+        "cssVar": "--accent",
+        "tonalRamp": [
+          "#00163d",
+          "#002970",
+          "#003ba3",
+          "#0053e6",
+          "#2977ff",
+          "#669eff",
+          "#a3c5ff",
+          "#e0ecff"
+        ]
+      },
+      "accent-ink": {
+        "role": "neutral",
+        "displayName": "Accent Ink",
+        "canonical": "#06090f",
+        "cssVar": "--accent-ink",
+        "tonalRamp": [
+          "#111a2c",
+          "#203050",
+          "#2f4675",
+          "#4262a4",
+          "#6685c2",
+          "#92a8d3",
+          "#bdcbe5",
+          "#e9eef6"
+        ]
+      },
+      "pencil-amber": {
+        "role": "secondary",
+        "displayName": "Pencil Amber",
+        "canonical": "#e5b25d",
+        "cssVar": "--annotate",
+        "tonalRamp": [
+          "#352408",
+          "#614210",
+          "#8d6017",
+          "#c68820",
+          "#e1a746",
+          "#eac07b",
+          "#f2d9b0",
+          "#fbf2e5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Uppercase page titles, the role headline (solid + outline pair), and the active story chapter verb; one on screen at a time."
+      },
+      "display-sm": {
+        "displayName": "Display Small",
+        "purpose": "Homepage scene titles and the below-900px step-down for display-size type."
+      },
+      "statement": {
+        "displayName": "Statement",
+        "purpose": "Sentence-case display-size openers in the scroll story: work-rail intro, contact sentence; Path words at 700."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section heads, project titles, work-rail panel titles; contact email at 550."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Case blocks, post titles, story chapter lines."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "One-sentence intro under a display title; work-rail questions at 500."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running copy in Graphite Text, max 65ch."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Annotation notes."
+      },
+      "label": {
+        "displayName": "Mono Label",
+        "purpose": "Data only: dates, stack, coordinates, indices, annotation and callout labels, rail ticks."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sculpture-contact",
+        "value": "radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, transparent 70%); filter: blur(8px)",
+        "purpose": "Ground shadow under the 3D bust only. The UI itself has no shadows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.22, 0.61, 0.36, 1)",
+        "purpose": "Default for all state transitions and entrances."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Symmetric moves."
+      },
+      {
+        "name": "state",
+        "value": "0.25s",
+        "purpose": "Color, border, and arrow-nudge (4px) transitions."
+      },
+      {
+        "name": "motion-flag",
+        "value": "html[data-motion=\"on\"] when prefers-reduced-motion: no-preference (inline head script, live)",
+        "purpose": "Gates all pinning and scroll-scrubbed motion; absent under reduced motion and without JS, which get the static composition."
+      },
+      {
+        "name": "scene-progress",
+        "value": "data-scene, data-chapters, data-scene-target -> --p, --cp, data-chapter, data-active, scene:progress {p, chapter, cp}",
+        "purpose": "Scroll scene engine (src/lib/scroll-scenes.ts); with motion off it settles p = cp = 1 on the last chapter."
+      },
+      {
+        "name": "scene-pin",
+        "value": "stage sticky at top: header height, height: 100svh - header; scene height via --scene-h",
+        "purpose": "Pinned stage for story (560vh), Path (220vh), work rail (100svh + track overflow)."
+      },
+      {
+        "name": "scrub-properties",
+        "value": "transform, opacity, stroke-dashoffset, clip-path",
+        "purpose": "The only properties scroll-linked and entrance motion may animate."
+      },
+      {
+        "name": "chapter-layer",
+        "value": "opacity + translateY(24px), 0.5s",
+        "purpose": "Story chapter layers enter from below and leave upward."
+      },
+      {
+        "name": "line-draw",
+        "value": "stroke-dashoffset with pathLength=1, scrubbed by --cp or --p",
+        "purpose": "Chapter drawings and the Path line draw with scroll."
+      },
+      {
+        "name": "rail-reveal",
+        "value": "translate3d track; plate clip-path inset up to 35% + scale 0.94-1",
+        "purpose": "Work rail panels reveal as they reach centre."
+      },
+      {
+        "name": "word-reveal",
+        "value": "0.7s, translateY(0.6em), 60ms stagger",
+        "purpose": "Contact sentence word by word, scripting-guarded."
+      },
+      {
+        "name": "reveal",
+        "value": "0.7s, translateY(14px)",
+        "purpose": "Scroll entrance via data-reveal on inner pages, only when scripting is enabled; staggered by --d."
+      },
+      {
+        "name": "plate-tilt",
+        "value": "max 4deg, 0.4s, perspective 900px",
+        "purpose": "Pointer tilt on project plates, fine pointers only."
+      },
+      {
+        "name": "bust-yaw",
+        "value": "clamp +-0.6 rad",
+        "purpose": "Bust stays front-facing under scroll, sway, and pointer yaw."
+      },
+      {
+        "name": "sculpture-fade",
+        "value": "opacity 1.1s, 0.15s delay",
+        "purpose": "Poster to live 3D cross-fade."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wordmark",
+        "value": "560px"
+      },
+      {
+        "name": "section-note",
+        "value": "620px"
+      },
+      {
+        "name": "nav",
+        "value": "760px"
+      },
+      {
+        "name": "layout",
+        "value": "900px"
+      },
+      {
+        "name": "rail-labels",
+        "value": "1200px"
+      },
+      {
+        "name": "short-viewport",
+        "value": "max-height 700px (Path unpins)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one primary action per view (See the work, Start a conversation on detail pages).",
+      "html": "<a class=\"ds-btn ds-btn-primary\" href=\"#\">See the work <span class=\"ds-btn-arrow\"><svg width=\"1em\" height=\"1em\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><path d=\"M2 8H13M9 4L13 8L9 12\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\"/></svg></span></a>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-btn{display:inline-flex;align-items:center;gap:0.75rem;padding:0.95rem 1.4rem;border:1px solid transparent;border-radius:0;font-family:var(--font-display);font-size:0.9375rem;font-weight:500;line-height:1.2;text-decoration:none;cursor:pointer;transition:background-color .25s var(--ease-out),border-color .25s var(--ease-out),color .25s var(--ease-out);} .ds-btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);} .ds-btn-primary:hover{background:color-mix(in srgb,var(--accent) 80%,white);border-color:color-mix(in srgb,var(--accent) 80%,white);} .ds-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px;} .ds-btn-arrow{display:inline-flex;transition:transform .25s var(--ease-out);} .ds-btn:hover .ds-btn-arrow{transform:translateX(4px);}"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Secondary action beside a primary, and the compact header Contact.",
+      "html": "<a class=\"ds-btn-quiet\" href=\"#\">Start a conversation</a>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-btn-quiet{display:inline-flex;align-items:center;padding:0.95rem 1.4rem;background:transparent;color:var(--text);border:1px solid var(--border-control);border-radius:0;font-family:var(--font-display);font-size:0.9375rem;font-weight:500;line-height:1.2;text-decoration:none;transition:border-color .25s var(--ease-out);} .ds-btn-quiet:hover{border-color:var(--accent);} .ds-btn-quiet:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Sticky header: mono wordmark left, links and compact Contact right; current page underlined in blue.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-brand\" href=\"#\">DITYATH <span>/ WORKSPACE</span></a><nav class=\"ds-links\"><a href=\"#\" aria-current=\"page\">Work</a><a href=\"#\">About</a><a href=\"#\">Services</a><a href=\"#\">Writing</a><a class=\"ds-contact\" href=\"#\">Contact</a></nav></header>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-nav{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;min-height:4rem;padding:0 1.5rem;background:var(--bg);border-bottom:1px solid var(--border);} .ds-brand{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.12em;font-weight:500;color:var(--text);text-decoration:none;} .ds-brand span{color:var(--muted);} .ds-links{display:flex;align-items:center;gap:2rem;} .ds-links a{font-family:var(--font-display);font-size:0.9375rem;color:var(--text-2);text-decoration:none;text-underline-offset:0.4em;text-decoration-thickness:1px;transition:color .25s var(--ease-out);} .ds-links a:hover{color:var(--text);} .ds-links a[aria-current=page]{color:var(--text);text-decoration:underline;text-decoration-color:var(--accent);} .ds-links a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;} .ds-links .ds-contact{padding:0.5rem 1rem;font-size:0.875rem;font-weight:500;color:var(--text);border:1px solid var(--border-control);} .ds-links .ds-contact:hover{border-color:var(--accent);}"
+    },
+    {
+      "name": "Annotation",
+      "kind": "custom",
+      "refersTo": "annotation-label",
+      "description": "The reasoning layer on case pages: amber dot terminal, leader line, mono label, optional note.",
+      "html": "<div class=\"ds-annotation\"><div class=\"ds-line\"><span class=\"ds-dot\"></span><span class=\"ds-leader\"></span><span class=\"ds-label\">01 Frame</span></div><p class=\"ds-text\">Name the real problem before anyone writes code.</p></div>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-annotation{display:flex;flex-direction:column;gap:0.4rem;max-width:28ch;} .ds-line{display:flex;align-items:center;} .ds-dot{width:6px;height:6px;border-radius:50%;background:var(--annotate);flex:none;} .ds-leader{width:2rem;height:1px;background:var(--annotate);flex:none;} .ds-label{margin-inline:0.6rem;color:var(--annotate);font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;} .ds-text{font-family:var(--font-display);font-size:0.8125rem;line-height:1.5;color:var(--text-2);margin:0;}"
+    },
+    {
+      "name": "Story Callout",
+      "kind": "custom",
+      "refersTo": "callout-label",
+      "description": "Amber dot on a point of the bust, horizontal leader, mono label in the stage edge zone outside the silhouette; active chapter at full strength.",
+      "html": "<div class=\"ds-stage\"><div class=\"ds-head\"></div><div class=\"ds-callout ds-left\" style=\"top:30%\"><span class=\"ds-tag\">Frame</span><span class=\"ds-lead\"></span><span class=\"ds-pt\"></span></div><div class=\"ds-callout ds-right ds-dim\" style=\"top:60%\"><span class=\"ds-pt\"></span><span class=\"ds-lead\"></span><span class=\"ds-tag\">Decide</span></div></div>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-stage{position:relative;height:200px;background:var(--bg);} .ds-head{position:absolute;left:38%;top:10%;width:24%;height:80%;border:1px dashed var(--border-strong);} .ds-callout{position:absolute;display:flex;align-items:center;transform:translateY(-50%);} .ds-left{left:4px;right:56%;} .ds-right{left:56%;right:4px;} .ds-lead{flex:1;height:1px;background:var(--annotate);} .ds-pt{width:6px;height:6px;border-radius:50%;background:var(--annotate);flex:none;} .ds-tag{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--annotate);margin-inline:0.75rem;} .ds-dim{opacity:0.6;}"
+    },
+    {
+      "name": "Section Head",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Headline, a hairline filling the row, optional mono note.",
+      "html": "<header class=\"ds-head\"><h2>Selected work</h2><span class=\"ds-rule\"></span><span class=\"ds-note\">2022 — now</span></header>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-head{display:flex;align-items:baseline;gap:1.5rem;} .ds-head h2{margin:0;font-family:var(--font-display);font-size:clamp(1.875rem,3.6vw,2.75rem);font-weight:600;letter-spacing:-0.03em;line-height:1.1;color:var(--text);} .ds-rule{flex:1;align-self:center;height:1px;background:var(--border);} .ds-note{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}"
+    },
+    {
+      "name": "Project Plate",
+      "kind": "card",
+      "refersTo": "project-plate",
+      "description": "Square hairline plate holding line-drawn project art; border strengthens on hover.",
+      "html": "<a class=\"ds-plate\" href=\"#\"><svg viewBox=\"0 0 200 120\" width=\"100%\" fill=\"none\" aria-hidden=\"true\"><path d=\"M30 100 A70 70 0 0 1 100 30\" stroke=\"#a3acba\" stroke-width=\"1\"/><circle cx=\"100\" cy=\"30\" r=\"3\" fill=\"#4c8dff\"/><circle cx=\"30\" cy=\"100\" r=\"3\" stroke=\"#a3acba\"/></svg></a>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-plate{display:block;background:var(--surface);border:1px solid var(--border);border-radius:0;padding:clamp(1.25rem,2.5vw,2.5rem);transition:border-color .3s var(--ease-out);} .ds-plate:hover{border-color:var(--border-strong);} .ds-plate:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}"
+    },
+    {
+      "name": "Ruled Row",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Hairline-divided list row (services, writing) with mono date, title, blue CTA; tints on hover.",
+      "html": "<ul class=\"ds-rows\"><li><a class=\"ds-row\" href=\"#\"><span class=\"ds-date\">Mar 2026</span><span class=\"ds-title\">Writing down the trade-off</span><span class=\"ds-arrow\"><svg width=\"1em\" height=\"1em\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><path d=\"M2 8H13M9 4L13 8L9 12\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\"/></svg></span></a></li></ul>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--border);} .ds-rows li{border-bottom:1px solid var(--border);} .ds-row{display:grid;grid-template-columns:2fr 8fr auto;gap:1.5rem;align-items:baseline;padding:1.75rem 0;color:var(--text);text-decoration:none;transition:background-color .25s var(--ease-out);} .ds-row:hover{background:color-mix(in srgb,var(--surface) 70%,transparent);} .ds-row:focus-visible{outline:2px solid var(--accent);outline-offset:3px;} .ds-date{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);} .ds-title{font-family:var(--font-display);font-size:clamp(1.375rem,2.2vw,1.75rem);font-weight:600;letter-spacing:-0.02em;line-height:1.2;} .ds-arrow{color:var(--accent);display:inline-flex;transition:transform .25s var(--ease-out);} .ds-row:hover .ds-arrow{transform:translateX(4px);}"
+    },
+    {
+      "name": "Work Rail Panel",
+      "kind": "card",
+      "refersTo": "work-panel",
+      "description": "Horizontal rail panel: hairline plate with line art, Headline title, question, blue CTA with the Arrow icon.",
+      "html": "<a class=\"ds-panel\" href=\"#\"><div class=\"ds-plate\"><svg viewBox=\"0 0 200 100\" width=\"100%\" fill=\"none\" aria-hidden=\"true\"><path d=\"M20 80 L100 20 L180 80\" stroke=\"#a3acba\"/><rect x=\"96\" y=\"16\" width=\"8\" height=\"8\" fill=\"#4c8dff\"/></svg></div><h3>Clinic scheduling</h3><p class=\"ds-q\">What has to be true before a booking can be trusted?</p><span class=\"ds-cta\">Read the case <svg width=\"1em\" height=\"1em\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><path d=\"M2 8H13M9 4L13 8L9 12\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\"/></svg></span></a>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-panel{display:grid;gap:0.5rem;color:var(--text);text-decoration:none;max-width:32rem;} .ds-plate{background:var(--surface);border:1px solid var(--border);padding:clamp(1rem,3vw,2.5rem);margin-bottom:0.75rem;transition:border-color .3s var(--ease-out);} .ds-panel:hover .ds-plate{border-color:var(--border-strong);} .ds-panel:focus-visible{outline:2px solid var(--accent);outline-offset:3px;} .ds-panel h3{margin:0;font-family:var(--font-display);font-size:clamp(1.875rem,3.6vw,2.75rem);font-weight:600;letter-spacing:-0.03em;line-height:1.1;} .ds-q{margin:0;font-family:var(--font-display);font-size:clamp(1.125rem,1.4vw,1.25rem);font-weight:500;line-height:1.3;color:var(--text-2);max-width:38ch;} .ds-cta{display:inline-flex;gap:0.5rem;align-items:center;color:var(--accent);font-family:var(--font-display);font-weight:500;} .ds-cta svg{transition:transform .25s var(--ease-out);} .ds-panel:hover .ds-cta svg{transform:translateX(4px);}"
+    },
+    {
+      "name": "Path Station",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Career station on the scroll-drawn line: 9px blue square pip, large word, blue mono year, one Graphite line.",
+      "html": "<ol class=\"ds-path\"><li><span class=\"ds-pip\"></span><p class=\"ds-word\">Design</p><p class=\"ds-year\">2019</p><p class=\"ds-line\">Learning to frame problems for the people who have them.</p></li><li><span class=\"ds-pip\"></span><p class=\"ds-word\">Build</p><p class=\"ds-year\">2021</p><p class=\"ds-line\">Learning what code costs, and where it breaks.</p></li></ol>",
+      "css": ":host{--bg:#0f1115;--surface:#171a21;--surface-2:#1c2029;--border:#262b35;--border-strong:#333b49;--border-control:#5b6474;--text:#f4f7fb;--text-2:#a3acba;--muted:#7a8391;--accent:#4c8dff;--accent-ink:#06090f;--annotate:#e5b25d;--font-display:'Inter Tight Variable',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;--ease-out:cubic-bezier(0.22,0.61,0.36,1);} .ds-path{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;border-top:1px solid var(--border-strong);} .ds-path li{position:relative;padding-top:2rem;display:grid;gap:0.5rem;} .ds-pip{position:absolute;top:-5px;left:0;width:9px;height:9px;background:var(--accent);} .ds-word{margin:0;font-family:var(--font-display);font-size:clamp(2.5rem,5.6vw,4.25rem);font-weight:700;line-height:1.05;letter-spacing:-0.04em;color:var(--text);} .ds-year{margin:0;font-family:var(--font-mono);font-size:0.8125rem;letter-spacing:0.12em;color:var(--accent);} .ds-line{margin:0;font-family:var(--font-display);color:var(--text-2);max-width:26ch;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Annotated Working Drawing",
+    "overview": "**Creative North Star: \"The Annotated Working Drawing\"**\n\nThe site is a technical drawing of a person's reasoning, laid on a dark graphite sheet. Everything structural is drafted: 1px hairlines divide sections, a shared 12-column grid carries page intros and project plates on the same tracks, and progress rails and ruled rows mark the sheet as a working surface. On top of that build layer sits a second, human layer: pencil-amber annotations with dot terminals and leader lines, used only where a thought is being explained.\n\nDensity is calm and editorial. Large tightly tracked display type opens each page, sections breathe on generous vertical rhythm, and nothing floats on a shadow. Depth comes from real geometry (the 3D Dionysus bust, a few degrees of pointer tilt on project plates), never from elevation chrome. The homepage is a scroll story: pinned scenes whose progress is driven by the scroll position, so the drawing is made while the visitor scrolls (frames and rulers draw around the bust, the bust turns and dissolves into points, the work slides past, the career line draws itself). Every scene also exists as a complete static composition for reduced motion and for no JavaScript.\n\nTwo type voices split the work: Inter Tight for every word a person reads, IBM Plex Mono for data (dates, stack, coordinates, indices, annotation and callout labels).",
+    "keyCharacteristics": [
+      "Graphite dark ground with a single blueprint-blue accent and an amber reserved for annotations and drawn marks.",
+      "Square corners everywhere; the only round shapes are 6px dot terminals and status dots.",
+      "Hairline rules, not cards or shadows, separate content.",
+      "Uppercase, tightly tracked display headlines; one outline line in the role headline pair.",
+      "Motion is drafting motion, scrubbed by scroll: lines draw in, labels step forward, panels slide; it animates only transform, opacity, stroke-dashoffset, and clip-path, and settles to a static composition under reduced motion or without JavaScript."
+    ],
+    "rules": [
+      {
+        "name": "The Two Inks Rule",
+        "body": "Blue is the build, amber is the thinking. Amber appears only as annotation (label, leader line, dot terminal, drawn frame or ruler); it is never a button, link, or heading color. Inside an amber drawing, blue marks the thing that gets built (the chosen path, the shipped cell).",
+        "section": "colors"
+      },
+      {
+        "name": "The Muted Floor Rule",
+        "body": "Muted Graphite holds AA only on Graphite Ground and Drafting Surface. Small muted text never sits on the raised surface.",
+        "section": "colors"
+      },
+      {
+        "name": "The Data Voice Rule",
+        "body": "Plex Mono carries data and labels only. Sentences, headings, and buttons are always Inter Tight.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Display Rule",
+        "body": "One uppercase display line is on screen at a time: the page title, or in the pinned story the active chapter's layer. Section openers further down use Statement or Display Small in sentence case, never a second uppercase display.",
+        "section": "typography"
+      },
+      {
+        "name": "The Real Depth Rule",
+        "body": "If something needs depth, give it geometry (perspective, translateZ, the 3D bust), not a drop shadow. Pointer tilt on plates is capped at 4 degrees and disabled for coarse pointers and reduced motion.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Front-Facing Rule",
+        "body": "The bust always faces the visitor: scroll, sway, and pointer yaw together are clamped to ±0.6 rad, so the hollow back of the scan never shows. It is the only 3D object.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** separate content with 1px hairlines (`hairline`) and tonal surfaces, never shadows.",
+      "**Do** keep every corner square; reserve circles for 6px dot terminals.",
+      "**Do** use Pencil Amber only for annotations and drawn marks: dot, leader, mono label, frame, ruler.",
+      "**Do** set dates, stacks, coordinates, and indices in Plex Mono 0.75rem uppercase at 0.12em.",
+      "**Do** align new sections to the 12-column grid and collapse to one column at 900px.",
+      "**Do** build scroll motion on the scene engine and animate only transform, opacity, stroke-dashoffset, and clip-path.",
+      "**Do** give every scene a finished static composition under `html:not([data-motion=\"on\"])`, so reduced motion and no JavaScript see the whole story.",
+      "**Do** keep callout labels in the stage's edge zones with the leader running to a dot on the model.",
+      "**Do** use the authored Arrow icon for every arrow."
+    ],
+    "donts": [
+      "**Don't** use amber for buttons, links, headings, or decoration.",
+      "**Don't** add box-shadows, rounded cards, or gradient fills.",
+      "**Don't** set sentences or headings in Plex Mono, or data in Inter Tight.",
+      "**Don't** put Muted Graphite text on Drafting Surface Raised.",
+      "**Don't** tilt or rotate interface elements beyond 4 degrees, or turn the bust beyond ±0.6 rad.",
+      "**Don't** use Unicode glyphs (→ ← ↗) as icons.",
+      "**Don't** hide content behind motion: nothing may start invisible unless the motion flag or a scripting guard is set."
+    ]
+  }
+}

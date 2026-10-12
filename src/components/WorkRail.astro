@@ -1,0 +1,344 @@
+---
+import { projects, yearSpan } from '../data/projects';
+import Arrow from './Arrow.astro';
+import ProjectArt from './ProjectArt.astro';
+
+const featured = projects.filter((project) => project.featured);
+const dataLine = `${yearSpan(featured)} · ${featured.length} of ${projects.length}`;
+---
+
+<section id="work" class="scene work-rail" data-scene data-scene-target="[data-track]" aria-labelledby="work-title">
+  <div class="scene-stage">
+    <div class="track" data-track>
+      <div class="panel panel-intro">
+        <h2 id="work-title">Selected work</h2>
+        <p class="mono data">{dataLine}</p>
+      </div>
+
+      {featured.map((project) => (
+        <a class="panel panel-project" data-panel href={`/work/${project.slug}/`}>
+          <div class="plate">
+            <div class="plate-art">
+              <ProjectArt art={project.art} index={project.index} />
+            </div>
+          </div>
+          <div class="info">
+            <h3>{project.title}</h3>
+            <p class="question">{project.question}</p>
+            <span class="cta">Read the case <Arrow class="arrow" /></span>
+          </div>
+        </a>
+      ))}
+
+      <div class="panel panel-outro" data-panel>
+        <a class="link-arrow all" href="/work/">All work <span aria-hidden="true"><Arrow /></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { clamp01, initScenes, smoothstep } from '../lib/scroll-scenes';
+
+  const root = document.documentElement;
+  const wide = window.matchMedia('(min-width: 901px)');
+
+  const setup = () => {
+    const section = document.querySelector<HTMLElement>('#work.work-rail');
+    if (!section || section.dataset.railReady) return;
+    const stage = section.querySelector<HTMLElement>('.scene-stage');
+    const track = section.querySelector<HTMLElement>('[data-track]');
+    if (!stage || !track) return;
+    section.dataset.railReady = 'true';
+    const panels = Array.from(section.querySelectorAll<HTMLElement>('[data-panel]'));
+
+    let pinned = false;
+    let dist = 0;
+    let sw = 0;
+    let lastP = 0;
+    const geo = panels.map(() => ({ x: 0, w: 1 }));
+
+    const paint = (p: number) => {
+      lastP = p;
+      if (!pinned) return;
+      track.style.transform = `translate3d(${(-p * dist).toFixed(2)}px,0,0)`;
+      panels.forEach((panel, i) => {
+        const g = geo[i];
+        const k = (g.x + g.w / 2 - p * dist - sw / 2) / g.w;
+        const a = 1 - smoothstep(0.3, 1, Math.abs(k));
+        panel.style.setProperty('--k', k.toFixed(4));
+        panel.style.setProperty('--a', a.toFixed(4));
+      });
+    };
+
+    const reset = () => {
+      section.style.removeProperty('--dist');
+      track.style.removeProperty('transform');
+      section.style.removeProperty('--scene-h');
+      for (const panel of panels) {
+        panel.style.removeProperty('--k');
+        panel.style.removeProperty('--a');
+      }
+    };
+
+    const measure = () => {
+      pinned = wide.matches && root.dataset.motion === 'on';
+      if (pinned) {
+        sw = stage.clientWidth;
+        // Stop when the last project sits at the content edge, with the outro
+        // link beside it, rather than scrolling it half off screen.
+        const last = panels.filter((panel) => panel.classList.contains('panel-project')).at(-1);
+        // The track's first child (the intro) starts at the content edge.
+        const start = (track.firstElementChild as HTMLElement | null)?.offsetLeft ?? 0;
+        const toLast = last ? last.offsetLeft - start : Number.POSITIVE_INFINITY;
+        dist = Math.max(0, Math.min(track.scrollWidth - sw, toLast));
+        section.style.setProperty('--dist', `${dist}px`);
+        section.style.setProperty('--scene-h', `calc(100svh + ${dist}px)`);
+        panels.forEach((panel, i) => {
+          geo[i] = { x: panel.offsetLeft, w: panel.offsetWidth || 1 };
+        });
+        paint(lastP);
+      } else {
+        reset();
+      }
+    };
+
+    section.addEventListener('scene:progress', (e) => {
+      paint(clamp01((e as CustomEvent<{ p: number }>).detail.p));
+    });
+
+    // Keyboard focus on a panel that is not fully on screen: scroll the page so it is centred.
+    track.addEventListener('focusin', (e) => {
+      if (!pinned || dist <= 0) return;
+      const i = panels.findIndex((panel) => panel.contains(e.target as Node));
+      if (i < 0) return;
+      const g = geo[i];
+      const rectTop = section.getBoundingClientRect().top;
+      const p = clamp01(-rectTop / dist);
+      const left = g.x - p * dist;
+      if (left >= 0 && left + g.w <= sw) return;
+      const target = clamp01((g.x + g.w / 2 - sw / 2) / dist);
+      window.scrollTo({ top: rectTop + window.scrollY + target * dist, behavior: 'instant' });
+    });
+
+    wide.addEventListener('change', measure);
+    window.addEventListener('resize', measure);
+    new MutationObserver(measure).observe(root, {
+      attributes: true,
+      attributeFilter: ['data-motion'],
+    });
+    document.fonts?.ready.then(measure);
+    measure();
+    initScenes();
+  };
+
+  setup();
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  .work-rail {
+    /* Left edge of the page's content column, so the rail lines up with the
+       header and every other section. */
+    --edge: max(var(--gutter), calc((100vw - var(--container)) / 2));
+    --rail-gap: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  /* Default (no pinning: narrow screens, reduced motion, no JS): a plain
+     vertical sequence. Every project is in view as the page scrolls; nothing
+     hides behind a sideways swipe. */
+  .track {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 7vw, 5rem);
+    padding: clamp(3rem, 8vw, 5rem) var(--edge);
+  }
+
+  .panel {
+    min-width: 0;
+    color: inherit;
+  }
+  .panel-intro,
+  .panel-outro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .panel-intro h2 {
+    font-size: var(--step-5);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .data {
+    color: var(--muted);
+  }
+  .all {
+    align-self: flex-start;
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  .panel-project {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .plate {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: clamp(14rem, 56vw, 26rem);
+    background: var(--surface);
+    border: var(--hairline);
+    overflow: clip;
+    transition: border-color 0.3s var(--ease-out);
+  }
+  /* The figure fills the plate (its SVG scales to fit), instead of floating
+     small in the middle of a large empty surface. */
+  .plate-art {
+    position: absolute;
+    inset: clamp(1rem, 3vw, 2.5rem);
+    transform: translate3d(calc(var(--k, 0) * -4%), 0, 0) scale(calc(0.94 + 0.06 * var(--a, 1)));
+    /* Reveal left to right as the panel becomes active. */
+    clip-path: inset(0 calc((1 - var(--a, 1)) * 35%) 0 0);
+  }
+  .panel-project:focus-within {
+    --a: 1 !important;
+  }
+  .plate-art :global(.art) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .panel-project:hover .plate {
+    border-color: var(--border-strong);
+  }
+
+  .info {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+  }
+  h3 {
+    font-size: var(--step-3);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .question {
+    font-size: var(--step-1);
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--text-2);
+    max-width: 38ch;
+    opacity: var(--a, 1);
+    transform: translate3d(0, calc((1 - var(--a, 1)) * 16px), 0);
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .cta :global(.arrow) {
+    display: inline-block;
+    transition: transform 0.25s var(--ease-out);
+  }
+  .panel-project:hover .cta :global(.arrow) {
+    transform: translateX(4px);
+  }
+
+  /* Wide screens without pinning (reduced motion / no JS): alternating rows. */
+  @media (min-width: 901px) {
+    html:not([data-motion='on']) .work-rail .track {
+      gap: clamp(3rem, 8vw, 7rem);
+    }
+    html:not([data-motion='on']) .work-rail .panel-project {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      align-items: center;
+      gap: clamp(1.5rem, 4vw, 4rem);
+    }
+    html:not([data-motion='on']) .work-rail .panel-project:nth-of-type(even) {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    }
+    html:not([data-motion='on']) .work-rail .panel-project:nth-of-type(even) .plate {
+      order: 2;
+    }
+    html:not([data-motion='on']) .work-rail .plate {
+      min-height: 22rem;
+    }
+  }
+
+  /* Pinned horizontal motion. The intro and outro are narrow columns, so the
+     first project is already on screen when the rail pins, and the rail ends
+     on the last project rather than on an empty screen. */
+  @media (min-width: 901px) {
+    html[data-motion='on'] .work-rail .track {
+      flex-direction: row;
+      align-items: stretch;
+      gap: var(--rail-gap);
+      width: max-content;
+      height: 100%;
+      padding-block: clamp(1.5rem, 4vh, 3rem);
+    }
+    html[data-motion='on'] .work-rail[data-active] .track {
+      will-change: transform;
+    }
+    html[data-motion='on'] .work-rail .panel-project {
+      flex: 0 0 min(78vw, 68rem);
+    }
+    html[data-motion='on'] .work-rail .panel-intro {
+      flex: 0 0 clamp(16rem, 24vw, 22rem);
+    }
+    html[data-motion='on'] .work-rail .panel-outro {
+      flex: 0 0 clamp(12rem, 18vw, 16rem);
+    }
+    html[data-motion='on'] .work-rail .panel-intro h2 {
+      font-size: var(--step-4);
+    }
+    html[data-motion='on'] .work-rail .plate {
+      min-height: 0;
+    }
+    /* Same info height on every panel, so titles sit on one line as the
+       rail moves instead of jumping with the length of each question. */
+    html[data-motion='on'] .work-rail .info {
+      flex: 0 0 auto;
+      min-height: 9.5rem;
+    }
+  }
+
+  /* Narrow screens: never pin, even if the global scene rules are active. */
+  @media (max-width: 900px) {
+    html[data-motion='on'] .work-rail.scene {
+      height: auto;
+    }
+    html[data-motion='on'] .work-rail .scene-stage {
+      position: relative;
+      top: auto;
+      height: auto;
+      overflow: visible;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plate-art,
+    .question {
+      transform: none;
+      opacity: 1;
+    }
+    .plate-art {
+      clip-path: none;
+    }
+    .cta :global(.arrow) {
+      transition: none;
+    }
+    .panel-project:hover .cta :global(.arrow) {
+      transform: none;
+    }
+  }
+</style>

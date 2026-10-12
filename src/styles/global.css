@@ -1,0 +1,309 @@
+/* -------------------------------------------------
+   DITYATH / WORKSPACE — design tokens & base layer
+   ------------------------------------------------- */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #0f1115;
+  --surface: #171a21;
+  --surface-2: #1c2029;
+  --border: #262b35;
+  --border-strong: #333b49;
+  --text: #f4f7fb;
+  --text-2: #a3acba;
+  /* 4.9:1 on --bg. Do not darken: used at small sizes, where AA needs 4.5:1.
+     AA (>=4.5:1) only on --bg and --surface, NOT on --surface-2. */
+  --muted: #7a8391;
+  /* Control boundaries (WCAG 1.4.11, 3.17:1 on --bg) */
+  --border-control: #5b6474;
+  --accent: #4c8dff;
+  --accent-ink: #06090f;
+  /* Annotation labels only (the reasoning layer). ~9.8:1 on --bg. */
+  --annotate: #e5b25d;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: clamp(1.125rem, 1.4vw, 1.25rem);
+  --step-2: clamp(1.375rem, 2.2vw, 1.75rem);
+  --step-3: clamp(1.875rem, 3.6vw, 2.75rem);
+  --step-4: clamp(2.5rem, 5.6vw, 4.25rem);
+  --step-5: clamp(3rem, 8.4vw, 6rem);
+
+  --space-section: clamp(6rem, 12vw, 10rem);
+  --space-page-top: clamp(3rem, 7vw, 6rem);
+  --space-block: clamp(2.5rem, 5vw, 4rem);
+  --header-h: 4rem;
+
+  --font-display: "Inter Tight Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --container: 76rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --hairline: 1px solid var(--border);
+  --col-gap: clamp(1rem, 2vw, 2rem);
+
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scrollbar-color: var(--border-strong) var(--bg);
+  scrollbar-width: thin;
+  scroll-padding-top: var(--header-h);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+  caret-color: var(--accent);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 0.25em;
+}
+ul {
+  list-style: none;
+}
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* utilities */
+.container {
+  width: min(100% - (var(--gutter) * 2), var(--container));
+  margin-inline: auto;
+}
+
+/* Shared 12-column grid — hero and project cards align to the same tracks. */
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: var(--col-gap);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: var(--gutter);
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  transform: translateY(-150%);
+  transition: transform 0.2s var(--ease-out);
+}
+.skip-link:focus-visible {
+  transform: translateY(0.75rem);
+}
+
+/* section rhythm */
+.section {
+  padding-block: var(--space-section);
+}
+.section + .section {
+  border-top: var(--hairline);
+}
+
+/* buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1.4rem;
+  border: 1px solid transparent;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 0.25s var(--ease-out),
+    border-color 0.25s var(--ease-out),
+    color 0.25s var(--ease-out);
+}
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+.btn--primary:hover {
+  background: color-mix(in srgb, var(--accent) 80%, white);
+  border-color: color-mix(in srgb, var(--accent) 80%, white);
+}
+.btn--quiet {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border-control);
+}
+.btn--quiet:hover {
+  border-color: var(--accent);
+}
+.btn .btn-arrow {
+  display: inline-block;
+  transition: transform 0.25s var(--ease-out);
+}
+.btn:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-2);
+  transition: color 0.25s var(--ease-out);
+}
+.link-arrow > span {
+  display: inline-block;
+  transition: transform 0.25s var(--ease-out);
+}
+.link-arrow:hover {
+  color: var(--accent);
+}
+.link-arrow:hover > span {
+  transform: translateX(4px);
+}
+
+.prose {
+  max-width: 65ch;
+  color: var(--text-2);
+}
+.prose p + p {
+  margin-top: 1em;
+}
+
+/* 3D canvas — injected by sculpture.ts, so it lives in global scope. */
+.sculpture-live {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 1.1s var(--ease-out) 0.15s;
+}
+.sculpture-live canvas {
+  width: 100%;
+  height: 100%;
+}
+/* `is-live` is set on the stage one frame after the canvas has painted. */
+.sculpture-stage.is-live .sculpture-live {
+  opacity: 1;
+}
+
+/* scroll entrance
+   Guarded on `scripting: enabled`: the `is-in` class is only ever added by
+   JS, so without it these elements must start visible rather than at zero
+   opacity — otherwise a failed script blanks the entire page. */
+@media (scripting: enabled) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.7s var(--ease-out),
+      transform 0.7s var(--ease-out);
+    transition-delay: var(--d, 0ms);
+  }
+  [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The head script's safety net (BaseLayout.astro) sets `data-fallback` when the
+   bundled scripts never ran: everything they would have revealed shows now. */
+html[data-fallback] [data-reveal],
+html[data-fallback] [data-words] .w {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .sculpture-live {
+    transition: none;
+  }
+  .btn .btn-arrow,
+  .link-arrow > span {
+    transition: none;
+  }
+  .btn:hover .btn-arrow,
+  .link-arrow:hover > span {
+    transform: none;
+  }
+}
+
+/* Scroll scenes: pinned only when JS runs and motion is allowed (see
+   src/lib/scroll-scenes.ts). Otherwise they render as normal stacked content. */
+.scene,
+.scene-stage {
+  position: relative;
+}
+
+html[data-motion="on"] .scene {
+  height: var(--scene-h, 400vh);
+}
+
+html[data-motion="on"] .scene-stage {
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100svh - var(--header-h));
+  overflow: clip;
+}

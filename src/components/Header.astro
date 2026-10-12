@@ -1,0 +1,186 @@
+---
+import { navigation } from '../data/site';
+
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => {
+  const base = href.replace(/\/$/, '');
+  return pathname === base || pathname.startsWith(`${base}/`);
+};
+---
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand mono" href="/">DITYATH <span>/ WORKSPACE</span></a>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+    >
+      <span class="menu-label" data-closed="Menu" data-open="Close">Menu</span>
+    </button>
+    <nav id="site-nav" class="nav" aria-label="Primary">
+      {navigation.map((item) => (
+        <a class="nav-link" href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
+      <a class="btn btn--quiet contact" href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    transition: border-color 0.25s var(--ease-out);
+  }
+  :global(html[data-js]) .site-header { border-bottom-color: transparent; }
+  :global(html[data-js]) .site-header[data-scrolled] { border-bottom-color: var(--border); }
+
+  .bar {
+    width: min(100% - (var(--gutter) * 2), var(--container));
+    margin-inline: auto;
+    min-height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .brand { display: inline-flex; align-items: center; gap: 0.5em; min-block-size: 2.75rem; font-weight: 500; color: var(--text); white-space: nowrap; }
+  .brand span { color: var(--muted); }
+
+  .nav { display: flex; align-items: center; flex-wrap: wrap; gap: 0.25rem clamp(1.25rem, 3vw, 2.25rem); }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    font-size: 0.9375rem;
+    color: var(--text-2);
+    text-underline-offset: 0.4em;
+    text-decoration-thickness: 1px;
+    transition: color 0.25s var(--ease-out);
+  }
+  .nav-link:hover { color: var(--text); }
+  .nav-link[aria-current='page'] { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); }
+  .contact { padding: 0.5rem 1rem; font-size: 0.875rem; }
+
+  .menu-toggle { display: none; }
+
+  @media (max-width: 560px) {
+    .brand span { display: none; }
+  }
+
+  @media (max-width: 760px) {
+    /* No JS: nav stays visible, wrapping under the brand. */
+    .nav { width: 100%; padding-bottom: 0.75rem; }
+
+    :global(html[data-js]) .nav {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      flex-wrap: nowrap;
+      gap: 0;
+      padding: 0.5rem var(--gutter) 1.5rem;
+      background: var(--bg);
+      border-bottom: var(--hairline);
+      max-height: calc(100dvh - var(--header-h));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    :global(html[data-js]) .site-header[data-open] .nav { display: flex; }
+    /* Dim the page under the open menu so its edge reads clearly; a tap on
+       the dimmed area closes it (see the pointerdown handler). */
+    :global(html[data-js]) .site-header[data-open]::before {
+      content: '';
+      position: fixed;
+      inset: var(--header-h) 0 0;
+      z-index: -1;
+      background: rgb(8 9 12 / 0.78);
+    }
+    :global(html[data-js]) .nav-link {
+      font-size: var(--step-2);
+      font-weight: 500;
+      padding-block: 0.9rem;
+      min-block-size: 0;
+      display: flex;
+      border-bottom: var(--hairline);
+    }
+    :global(html[data-js]) .contact { margin-top: 1.25rem; justify-content: center; padding: 0.95rem 1.4rem; font-size: 0.9375rem; }
+
+    :global(html[data-js]) .menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      padding: 0 1rem;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border-control, #5B6474);
+      font: inherit;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    :global(html[data-js]) .menu-toggle:hover,
+    :global(html[data-js]) .site-header[data-open] .menu-toggle { border-color: var(--accent); }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const toggle = header?.querySelector<HTMLButtonElement>('.menu-toggle');
+  const nav = header?.querySelector<HTMLElement>('#site-nav');
+
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 4) header.setAttribute('data-scrolled', '');
+      else header.removeAttribute('data-scrolled');
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  if (header && toggle && nav) {
+    const setOpen = (open: boolean) => {
+      header.toggleAttribute('data-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      sync(open);
+    };
+    const label = toggle.querySelector<HTMLElement>('.menu-label');
+    const sync = (open: boolean) => {
+      if (label) label.textContent = open ? 'Close' : 'Menu';
+    };
+    const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+    header.addEventListener('focusout', (e) => {
+      const next = (e as FocusEvent).relatedTarget as Node | null;
+      if (isOpen() && next && !header.contains(next)) setOpen(false);
+    });
+    document.addEventListener('pointerdown', (e) => {
+      // The backdrop is the header's own ::before, so a tap on it targets the header itself.
+      const target = e.target as Node;
+      if (isOpen() && (target === header || !header.contains(target))) setOpen(false);
+    });
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    nav.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+    // Reset when growing past the mobile breakpoint.
+    window.matchMedia('(min-width: 761px)').addEventListener('change', (e) => {
+      if (e.matches) setOpen(false);
+    });
+  }
+</script>

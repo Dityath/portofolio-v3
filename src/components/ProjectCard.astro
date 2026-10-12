@@ -1,0 +1,159 @@
+---
+import type { Project } from '../data/projects';
+import Arrow from './Arrow.astro';
+import ProjectArt from './ProjectArt.astro';
+
+interface Props extends Project {
+  flip?: boolean;
+}
+
+const {
+  index,
+  slug,
+  title,
+  context,
+  year,
+  question,
+  description,
+  tags,
+  art,
+  flip = false,
+} = Astro.props;
+---
+
+<article data-reveal>
+  <a class:list={['project', 'grid-12', { flip }]} href={`/work/${slug}/`}>
+    <div class="project-art" data-tilt>
+      <div class="tilt-layer">
+        <ProjectArt art={art} index={index} />
+      </div>
+    </div>
+
+    <div class="project-info">
+      <h3>{title}</h3>
+      <p class="mono meta"><span class="year">{year}</span><span class="ctx">{context}</span></p>
+      <div class="q">
+        <span class="mark" aria-hidden="true"><span class="leader"></span><span class="dot"></span></span>
+        <p class="question">{question}</p>
+      </div>
+      <p class="desc">{description}</p>
+      <p class="mono tags">{tags.join(' · ')}</p>
+      <span class="cta">Read the case <span class="arrow" aria-hidden="true"><Arrow dir="right" /></span></span>
+    </div>
+  </a>
+</article>
+
+<script>
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const motionOk = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+  if (fine && motionOk) {
+    const MAX = 4;
+    document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((el) => {
+      let rect: DOMRect | null = null;
+      let frame = 0;
+      let px = 0;
+      let py = 0;
+      const apply = () => {
+        frame = 0;
+        if (!rect) return;
+        const x = (px - rect.left) / rect.width - 0.5;
+        const y = (py - rect.top) / rect.height - 0.5;
+        el.style.setProperty('--ry', (x * 2 * MAX).toFixed(2));
+        el.style.setProperty('--rx', (-y * 2 * MAX).toFixed(2));
+      };
+      el.addEventListener('pointerenter', () => {
+        rect = el.getBoundingClientRect();
+      });
+      el.addEventListener('pointermove', (e) => {
+        if (!rect) rect = el.getBoundingClientRect();
+        px = e.clientX;
+        py = e.clientY;
+        if (!frame) frame = requestAnimationFrame(apply);
+      });
+      el.addEventListener('pointerleave', () => {
+        rect = null;
+        if (frame) cancelAnimationFrame(frame);
+        frame = 0;
+        el.style.setProperty('--rx', '0');
+        el.style.setProperty('--ry', '0');
+      });
+    });
+  }
+</script>
+
+<style>
+  .project { align-items: center; color: inherit; }
+
+  .project-art {
+    grid-column: 1 / span 7;
+    background: var(--surface);
+    border: var(--hairline);
+    padding: clamp(1.25rem, 2.5vw, 2.5rem);
+    perspective: 900px;
+    transition: border-color 0.3s var(--ease-out);
+  }
+  .tilt-layer {
+    transform: rotateX(calc(var(--rx, 0) * 1deg)) rotateY(calc(var(--ry, 0) * 1deg));
+    transition: transform 0.4s var(--ease-out);
+  }
+  .project:hover .tilt-layer,
+  .project:focus-visible .tilt-layer { will-change: transform; }
+  .project-info { grid-column: 8 / span 5; }
+  .project.flip .project-art { grid-column: 6 / span 7; order: 2; }
+  .project.flip .project-info { grid-column: 1 / span 5; order: 1; }
+
+  .project:hover .project-art { border-color: var(--border-strong); }
+  .project:focus-visible .tilt-layer { transform: rotateX(0deg) rotateY(-2deg); }
+
+  .meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; color: var(--muted); margin-top: 0.6rem; }
+  .year { color: var(--text-2); padding-right: 0.75rem; border-right: var(--hairline); }
+  .ctx { min-width: 0; }
+  h3 {
+    font-size: var(--step-3);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .q { position: relative; margin-top: 1.5rem; padding-left: 2.25rem; }
+  .mark { position: absolute; left: 0; top: calc(var(--step-2) * 0.625 - 3px); display: flex; align-items: center; }
+  .mark .leader { width: 1.5rem; height: 1px; background: var(--annotate); }
+  .mark .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--annotate); }
+  .question {
+    font-size: var(--step-2);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--text);
+    max-width: 30ch;
+  }
+  .desc { color: var(--text-2); max-width: 45ch; margin-top: 0.9rem; }
+  .tags { color: var(--muted); margin-top: 1.25rem; }
+  .cta {
+    display: inline-flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .arrow { display: inline-block; transition: transform 0.25s var(--ease-out); }
+  .project:hover .arrow { transform: translateX(4px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tilt-layer { transition: none; transform: none; }
+    .project:focus-visible .tilt-layer { transform: none; }
+  }
+
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .project,
+    .project.flip {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+      align-items: stretch;
+    }
+    .project.flip .project-art { order: 0; }
+    .project.flip .project-info { order: 1; }
+  }
+</style>

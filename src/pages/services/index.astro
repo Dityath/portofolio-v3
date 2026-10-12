@@ -1,0 +1,22 @@
+---
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import Services from '../../components/Services.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Services — Ditya Athallah"
+  description="Three ways to work with Ditya Athallah: a technical audit, fractional technical leadership, and MVP planning and delivery advisory."
+>
+  <Header />
+  <main id="main">
+    <PageIntro
+      title="Services"
+      lede="Three bounded ways to bring me in, depending on whether you need a clear read, ongoing direction, or a plan before you build."
+    />
+    <Services />
+  </main>
+  <Footer />
+</BaseLayout>

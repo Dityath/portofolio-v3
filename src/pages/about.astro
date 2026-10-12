@@ -1,0 +1,40 @@
+---
+import About from '../components/About.astro';
+import Arrow from '../components/Arrow.astro';
+import Experience from '../components/Experience.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import PageIntro from '../components/PageIntro.astro';
+import Principles from '../components/Principles.astro';
+import { site } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About — Ditya Athallah"
+  description="How Ditya Athallah went from designing interfaces to leading delivery across web, mobile, and computer vision — and the principles he works by."
+>
+  <Header />
+  <main id="main">
+    <PageIntro
+      title="About"
+      lede="I started by designing interfaces, learned what code costs by building it, and now lead the decisions in between."
+      meta={`${site.location} · ${site.timezone}`}
+    />
+    <About />
+    <Principles />
+    <Experience />
+    <section class="section cta" aria-label="Next steps">
+      <div class="container cta-row" data-reveal>
+        <a class="btn btn--primary" href="/#contact">Start a conversation <span class="btn-arrow" aria-hidden="true"><Arrow dir="right" /></span></a>
+        <a class="link-arrow" href="/work/">See the work <span aria-hidden="true"><Arrow dir="right" /></span></a>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .cta { padding-block: clamp(4rem, 8vw, 6rem); }
+  .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem 2.5rem; }
+</style>

@@ -1,0 +1,43 @@
+---
+import { projects } from '../data/projects';
+import Arrow from './Arrow.astro';
+import ProjectCard from './ProjectCard.astro';
+import SectionHead from './SectionHead.astro';
+
+interface Props {
+  /** 'featured' previews the homepage selection plus an "All work" link; 'all' renders every record. */
+  variant?: 'featured' | 'all';
+}
+
+const { variant = 'all' } = Astro.props;
+
+const list = variant === 'featured' ? projects.filter((project) => project.featured) : projects;
+---
+
+<section class="section" id="work" aria-labelledby="work-title">
+  <div class="container">
+    {variant === 'all' ? (
+      <div class="sr-only"><SectionHead id="work-title" title="Selected work" /></div>
+    ) : (
+      <SectionHead id="work-title" title="Selected work" />
+    )}
+
+    <div class="systems-list">
+      {list.map((project, i) => <ProjectCard {...project} flip={i % 2 === 1} />)}
+    </div>
+
+    {variant === 'featured' && (
+      <div class="all-work" data-reveal>
+        <a class="link-arrow" href="/work/">All work <span aria-hidden="true"><Arrow dir="right" /></span></a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .systems-list {
+    display: grid;
+    gap: clamp(4.5rem, 9vw, 8rem);
+  }
+  .all-work { margin-top: clamp(3rem, 6vw, 5rem); }
+</style>

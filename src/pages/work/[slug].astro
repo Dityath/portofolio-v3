@@ -1,0 +1,214 @@
+---
+import Annotation from '../../components/Annotation.astro';
+import Arrow from '../../components/Arrow.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import ProjectArt from '../../components/ProjectArt.astro';
+import { type Project, projects } from '../../data/projects';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return projects.map((project, i) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      prev: projects[(i - 1 + projects.length) % projects.length],
+      next: projects[(i + 1) % projects.length],
+    },
+  }));
+}
+
+interface Props {
+  project: Project;
+  prev: Project;
+  next: Project;
+}
+
+const { project, prev, next } = Astro.props;
+---
+
+<BaseLayout title={`${project.title} — Ditya Athallah`} description={project.description}>
+  <Header />
+  <main id="main" class="case">
+    <article class="container">
+      <a class="link-arrow back" href="/work/"><span aria-hidden="true"><Arrow dir="left" /></span> All work</a>
+
+      <header class="head">
+        <h1>{project.title}</h1>
+        <p class="mono meta-line"><span class="year">{project.year}</span><span>{project.context}</span></p>
+        <div class="question-block">
+          <span class="mark" aria-hidden="true"><span class="leader"></span><span class="dot"></span></span>
+          <p class="question">{project.question}</p>
+        </div>
+      </header>
+
+      <dl class="meta">
+        <div><dt class="mono">Role</dt><dd>{project.role}</dd></div>
+        <div>
+          <dt class="mono">Stack</dt>
+          <dd><ul class="stack mono" role="list">{project.tags.map((tag) => <li>{tag}</li>)}</ul></dd>
+        </div>
+      </dl>
+
+      <div class="plate"><ProjectArt art={project.art} index={project.index} /></div>
+
+      <section class="block" aria-labelledby="move-title">
+        <h2 id="move-title">The move</h2>
+        <p class="move">{project.move}</p>
+      </section>
+
+      <section class="block" aria-labelledby="did-title">
+        <h2 id="did-title">What I did</h2>
+        <ol class="steps" role="list">
+          {project.approach.map((step, i) => (
+            <li><span class="mono n">{String(i + 1).padStart(2, '0')}</span><span>{step}</span></li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="block" aria-labelledby="outcome-title">
+        <h2 id="outcome-title">Outcome</h2>
+        <p class="outcome">{project.outcome}</p>
+      </section>
+
+      <section class="block" aria-labelledby="learned-title">
+        <h2 id="learned-title">What it taught me</h2>
+        <div class="pull">
+          <Annotation label="Reflection" />
+          <blockquote>{project.learned}</blockquote>
+        </div>
+      </section>
+
+      <p class="cta"><a class="btn btn--primary" href="/#contact">Talk about a similar problem <span class="btn-arrow" aria-hidden="true"><Arrow /></span></a></p>
+
+      <nav class="pager" aria-label="More case studies">
+        <a href={`/work/${prev.slug}/`} rel="prev">
+          <span class="mono dir"><span aria-hidden="true"><Arrow dir="left" /></span> Previous</span>
+          <span class="t">{prev.title}</span>
+          <span class="q">{prev.question}</span>
+        </a>
+        <a href={`/work/${next.slug}/`} rel="next" class="is-next">
+          <span class="mono dir">Next <span aria-hidden="true"><Arrow dir="right" /></span></span>
+          <span class="t">{next.title}</span>
+          <span class="q">{next.question}</span>
+        </a>
+      </nav>
+
+    </article>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .case { padding: var(--space-page-top, clamp(3rem, 7vw, 6rem)) 0 var(--space-section); }
+  .back { display: inline-flex; align-items: center; min-block-size: 2.75rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .head { max-width: 62rem; }
+  .meta-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; color: var(--muted); margin-top: 1rem; }
+  .year { color: var(--text-2); padding-right: 0.75rem; border-right: var(--hairline); }
+  h1 {
+    font-size: var(--step-5);
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+  .question-block { position: relative; margin-top: clamp(1.75rem, 4vw, 3rem); padding-left: 2.5rem; }
+  .mark { position: absolute; left: 0; top: calc(var(--step-3) * 0.575 - 3px); display: flex; align-items: center; }
+  .mark .leader { width: 1.75rem; height: 1px; background: var(--annotate); }
+  .mark .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--annotate); }
+  .question {
+    font-size: var(--step-3);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: var(--text);
+    max-width: 28ch;
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--col-gap);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-block: 1.25rem;
+    border-block: var(--hairline);
+  }
+  dt { color: var(--muted); margin-bottom: 0.4rem; }
+  dd { color: var(--text-2); }
+  .stack { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; color: var(--text-2); }
+
+  .plate {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+    background: var(--surface);
+    border: var(--hairline);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .plate :global(svg) { max-width: min(100%, 44rem); height: auto; margin-inline: auto; }
+  @media (min-width: 901px) {
+    .plate :global(svg) { height: clamp(14rem, 28vw, 24rem); width: auto; max-width: 100%; }
+  }
+
+  .block {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--col-gap);
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: 1.5rem;
+    border-top: var(--hairline);
+  }
+  .block h2 {
+    grid-column: 1 / span 4;
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .block > :not(h2) { grid-column: 5 / span 8; max-width: 62ch; }
+  .move { font-size: var(--step-1); color: var(--text); }
+  .outcome { color: var(--text-2); font-size: var(--step-1); }
+  .steps { display: grid; gap: 1rem; list-style: none; padding: 0; color: var(--text-2); }
+  .steps li { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.5rem; }
+  .n { color: var(--accent); padding-top: 0.2rem; }
+  .pull { display: grid; gap: 1rem; }
+  blockquote {
+    font-size: var(--step-2);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--col-gap);
+    margin-top: clamp(4rem, 8vw, 7rem);
+  }
+  .pager a {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: 1.5rem;
+    border: var(--hairline);
+    transition: border-color 0.25s var(--ease-out);
+  }
+  .pager a:hover { border-color: var(--accent); }
+  .pager .is-next { text-align: right; }
+  .dir { color: var(--accent); }
+  .pager .t { font-size: var(--step-2); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .pager .q { color: var(--text-2); }
+  .cta { margin-top: clamp(2rem, 4vw, 3rem); }
+
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .block { display: block; }
+    .block h2 { margin-bottom: 1.25rem; }
+    .pager { grid-template-columns: 1fr; }
+    .pager .is-next { text-align: left; }
+  }
+</style>

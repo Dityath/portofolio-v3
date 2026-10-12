@@ -1,0 +1,63 @@
+---
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-main">
+      <div class="col brand-col">
+        <a class="wordmark mono" href="/">DITYATH <span>/ WORKSPACE</span></a>
+        <p>Designing the thinking before the build.</p>
+      </div>
+      <p class="col place mono">{site.location} · {site.timezone}</p>
+      <nav class="col links" aria-label="Social">
+        {site.socials.map((s) => <a href={s.href} rel="me noopener">{s.label}</a>)}
+        <a href={`mailto:${site.email}?subject=${encodeURIComponent('A problem worth framing')}`}>Email</a>
+      </nav>
+    </div>
+    <div class="footer-base mono">
+      <span>&copy; {year} {site.name}</span>
+      <span>Built with Astro &amp; three.js</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { border-top: var(--hairline); padding-block: var(--space-block) 2rem; }
+  .footer-main {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: 2rem var(--col-gap);
+    align-items: baseline;
+  }
+  .wordmark { display: inline-flex; align-items: center; gap: 0.5em; min-block-size: 2.75rem; color: var(--text); font-weight: 500; }
+  .wordmark span { color: var(--muted); }
+  .brand-col p { margin-top: 0.75rem; color: var(--text-2); max-width: 32ch; }
+  .place { color: var(--muted); }
+  .links { display: flex; flex-wrap: wrap; gap: 0 1.5rem; }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    color: var(--text-2);
+    text-underline-offset: 0.3em;
+    transition: color 0.25s var(--ease-out);
+  }
+  .links a:hover { color: var(--accent); text-decoration: underline; }
+  .footer-base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    margin-top: var(--space-block);
+    padding-top: 1.25rem;
+    border-top: var(--hairline);
+    color: var(--muted);
+  }
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .footer-main { grid-template-columns: 1fr; }
+  }
+</style>

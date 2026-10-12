@@ -1,0 +1,35 @@
+---
+import Arrow from '../components/Arrow.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404 — Ditya Athallah" description="That page does not exist.">
+  <Header />
+  <main id="main" class="notfound">
+    <div class="container">
+      <p class="mono code">404</p>
+      <h1>Nothing was built here.</h1>
+      <p class="lede">The page you’re looking for doesn’t exist, or it moved when the site was redesigned.</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="/">Back to the start</a>
+        <a class="link-arrow" href="/work/">See the work <span aria-hidden="true"><Arrow dir="right" /></span></a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .notfound {
+    min-height: calc(100svh - var(--header-h));
+    display: flex;
+    align-items: center;
+    padding: var(--space-block) 0;
+  }
+  .code { color: var(--accent); margin-bottom: 1.25rem; }
+  h1 { max-width: 16ch; font-size: var(--step-4); font-weight: 700; line-height: 1; letter-spacing: -0.035em; text-transform: uppercase; overflow-wrap: anywhere; }
+  .lede { max-width: 50ch; margin-top: 1.25rem; color: var(--text-2); font-size: var(--step-1); }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem 2rem; margin-top: 2.25rem; }
+</style>

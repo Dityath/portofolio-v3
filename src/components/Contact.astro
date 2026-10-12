@@ -1,0 +1,138 @@
+---
+import { site } from '../data/site';
+import Arrow from './Arrow.astro';
+
+const words = 'Bring me a problem that isn’t clear yet.'.split(' ');
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent('A problem worth framing')}`;
+---
+
+<section class="contact" id="contact" aria-labelledby="contact-title">
+  <div class="container contact-inner" data-contact>
+    <h2 id="contact-title" data-words>
+      {words.map((w, i) => (
+        <><span class="w" style={`--w: ${i}`}>{w}</span>{i < words.length - 1 ? ' ' : ''}</>
+      ))}
+    </h2>
+    <!-- TODO(content-review): email and availability live in src/data/site.ts; confirm both before deployment. -->
+    <div class="actions">
+      <a class="contact-email" href={mailto}>{site.email} <Arrow dir="right" /></a>
+      <!-- A mail link does nothing on a desktop without a mail app, so the
+           address can also be copied. Hidden until the script can run it. -->
+      <button class="copy mono" type="button" data-copy={site.email} hidden>
+        <span data-copy-label>Copy address</span>
+      </button>
+      <span class="copy-status mono" role="status" data-copy-status></span>
+    </div>
+    <div class="meta mono">
+      <p class="availability"><span class="dot" aria-hidden="true"></span>{site.availability}</p>
+      <nav class="links" aria-label="Professional profiles">
+        {site.socials.map((s) => (
+          <a href={s.href} rel="me noopener">{s.label} <Arrow dir="up-right" /></a>
+        ))}
+      </nav>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ---- copy the address, with a spoken and visible confirmation ----
+  const copyButton = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const copyStatus = document.querySelector<HTMLElement>('[data-copy-status]');
+  if (copyButton && copyStatus && navigator.clipboard) {
+    copyButton.hidden = false;
+    let clear = 0;
+    copyButton.addEventListener('click', async () => {
+      const address = copyButton.dataset.copy ?? '';
+      try {
+        await navigator.clipboard.writeText(address);
+        copyStatus.textContent = 'Copied';
+      } catch {
+        copyStatus.textContent = `Couldn’t copy. Select ${address} instead.`;
+      }
+      window.clearTimeout(clear);
+      clear = window.setTimeout(() => {
+        copyStatus.textContent = '';
+      }, 2600);
+    });
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-contact]');
+  const heading = root?.querySelector<HTMLElement>('[data-words]');
+
+  // Word-by-word reveal of the heading when it scrolls into view.
+  if (root && heading) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      heading.classList.add('is-in');
+    } else {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io.disconnect();
+            heading.classList.add('is-in');
+          }
+        },
+        { threshold: 0.35 },
+      );
+      io.observe(heading);
+    }
+  }
+</script>
+
+<style>
+  .contact { padding: var(--space-section) 0; border-top: var(--hairline); }
+  .actions, .meta { max-width: 62rem; }
+  h2 { font-size: var(--step-5); font-weight: 600; line-height: 1; letter-spacing: -0.035em; max-width: 16ch; }
+  .w { display: inline-block; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem 2.5rem; margin-top: clamp(2rem, 4vw, 3rem); }
+  .contact-email {
+    display: inline-flex; gap: 0.75rem; align-items: center;
+    color: var(--text); font-size: var(--step-3); font-weight: 550; letter-spacing: -0.025em; line-height: 1.2;
+    text-decoration: none; border-bottom: 1px solid var(--accent); padding-bottom: 0.2em;
+    overflow-wrap: anywhere;
+    transition: color 0.25s var(--ease-out);
+  }
+  .contact-email:hover { color: var(--accent); }
+  .meta { display: flex; flex-wrap: wrap; gap: 1rem 2rem; margin-top: clamp(2rem, 4vw, 3rem); color: var(--text-2); }
+  .availability { display: inline-flex; align-items: center; gap: 0.6rem; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .links { display: flex; gap: 0 1.5rem; }
+  .links a {
+    display: inline-flex; align-items: center; gap: 0.35rem; min-block-size: 2.75rem;
+    color: var(--text);
+    text-decoration: underline; text-decoration-color: var(--border-strong);
+    text-underline-offset: 0.35em; text-decoration-thickness: 1px;
+    transition: color 0.25s var(--ease-out), text-decoration-color 0.25s var(--ease-out);
+  }
+  .links a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+
+  .copy {
+    min-block-size: 2.75rem;
+    padding: 0 1rem;
+    border: 1px solid var(--border-control);
+    background: transparent;
+    color: var(--text);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: border-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+  }
+  .copy:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-status { color: var(--annotate); font-size: 0.8125rem; }
+
+  @media (scripting: enabled) {
+    .w { opacity: 0; transform: translateY(0.6em); }
+    [data-words].is-in .w {
+      opacity: 1;
+      transform: none;
+      transition:
+        opacity 0.7s var(--ease-out),
+        transform 0.7s var(--ease-out);
+      transition-delay: calc(var(--w) * 60ms);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .w { opacity: 1; transform: none; transition: none; }
+  }
+</style>

@@ -1,0 +1,47 @@
+---
+import { experience, phases } from '../data/experience';
+import SectionHead from './SectionHead.astro';
+
+// One timeline, newest first. The phase (design, build, lead) is a tag on each
+// role rather than a grouping, so the dates read in order.
+const items = [...experience].sort((a, b) => b.start.localeCompare(a.start));
+const first = items.at(-1)?.start.slice(0, 4) ?? '';
+---
+
+<section class="section experience" aria-labelledby="experience-title">
+  <div class="container">
+    <SectionHead id="experience-title" title="Experience" note={`Professional work, ${first}–now`} />
+
+    <ol class="timeline" data-reveal>
+      {items.map((item) => (
+        <li class="grid-12">
+          <p class="mono period">{item.period}</p>
+          <div class="role">
+            <p class="role-name">{item.role}</p>
+            <p class="organisation">{item.organisation}</p>
+            <p class="mono phase">{phases[item.phase].label}</p>
+          </div>
+          <p class="summary">{item.summary}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .timeline { list-style: none; border-top: var(--hairline); }
+  .timeline li { border-bottom: var(--hairline); padding: 1.3rem 0; align-items: baseline; row-gap: 0.4rem; }
+  .period { grid-column: 1 / span 3; color: var(--muted); }
+  .role { grid-column: 4 / span 5; }
+  .role-name { font-size: var(--step-1); font-weight: 550; letter-spacing: -0.015em; }
+  .organisation { color: var(--text-2); }
+  .phase { margin-top: 0.4rem; color: var(--muted); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .summary { grid-column: 9 / span 4; color: var(--text-2); }
+
+  /* LAYOUT_BREAKPOINT — see src/constants.ts */
+  @media (max-width: 900px) {
+    .timeline li { display: block; }
+    .period { margin-bottom: 0.35rem; }
+    .summary { margin-top: 0.5rem; }
+  }
+</style>
